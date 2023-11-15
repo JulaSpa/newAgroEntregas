@@ -66,17 +66,22 @@ class _PerfilState extends State<Perfil> {
           backgroundColor: Colors.transparent,
           elevation: 0,
           centerTitle: true,
-          toolbarHeight: 60,
+          toolbarHeight: 70,
           iconTheme: const IconThemeData(color: Colors.white),
+          automaticallyImplyLeading: true,
         ),
         body: Center(
           child: SingleChildScrollView(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
-                FractionallySizedBox(
-                  widthFactor: 0.8,
-                  child: Container(
+                Container(
+                  constraints: const BoxConstraints(
+                    maxWidth:
+                        1000, // Ajusta la altura mínima según tus necesidades
+                  ),
+                  child: FractionallySizedBox(
+                    widthFactor: 0.8,
                     child: TextField(
                       style: const TextStyle(color: Colors.white),
                       decoration: const InputDecoration(
@@ -96,32 +101,43 @@ class _PerfilState extends State<Perfil> {
                     ),
                   ),
                 ),
-                FractionallySizedBox(
-                  widthFactor: 0.8,
-                  child: Container(
-                    padding: const EdgeInsetsDirectional.fromSTEB(0, 20, 0, 20),
-                    child: TextField(
-                      style: const TextStyle(color: Colors.white),
-                      decoration: const InputDecoration(
-                        enabledBorder: UnderlineInputBorder(
-                            borderSide: BorderSide(color: Colors.grey)),
-                        prefixIcon: Icon(
-                          Icons.account_circle_outlined,
-                          color: Colors.white,
+                Container(
+                  constraints: const BoxConstraints(
+                    maxWidth:
+                        1000, // Ajusta la altura mínima según tus necesidades
+                  ),
+                  child: FractionallySizedBox(
+                    widthFactor: 0.8,
+                    child: Container(
+                      padding:
+                          const EdgeInsetsDirectional.fromSTEB(0, 20, 0, 20),
+                      child: TextField(
+                        style: const TextStyle(color: Colors.white),
+                        decoration: const InputDecoration(
+                          enabledBorder: UnderlineInputBorder(
+                              borderSide: BorderSide(color: Colors.grey)),
+                          prefixIcon: Icon(
+                            Icons.account_circle_outlined,
+                            color: Colors.white,
+                          ),
+                          labelText: "Mail",
+                          labelStyle: TextStyle(
+                              color: Color.fromARGB(255, 252, 250, 250),
+                              fontSize: 11),
                         ),
-                        labelText: "Mail",
-                        labelStyle: TextStyle(
-                            color: Color.fromARGB(255, 252, 250, 250),
-                            fontSize: 11),
+                        //CONTROLADOR Mail
+                        controller: mail,
                       ),
-                      //CONTROLADOR Mail
-                      controller: mail,
                     ),
                   ),
                 ),
-                FractionallySizedBox(
-                  widthFactor: 0.8,
-                  child: Container(
+                Container(
+                  constraints: const BoxConstraints(
+                    maxWidth:
+                        1000, // Ajusta la altura mínima según tus necesidades
+                  ),
+                  child: FractionallySizedBox(
+                    widthFactor: 0.8,
                     child: TextField(
                       style: const TextStyle(color: Colors.white),
                       decoration: const InputDecoration(
@@ -141,9 +157,13 @@ class _PerfilState extends State<Perfil> {
                     ),
                   ),
                 ),
-                FractionallySizedBox(
-                  widthFactor: 0.8,
-                  child: Container(
+                Container(
+                  constraints: const BoxConstraints(
+                    maxWidth:
+                        1000, // Ajusta la altura mínima según tus necesidades
+                  ),
+                  child: FractionallySizedBox(
+                    widthFactor: 0.8,
                     child: CheckboxListTile(
                       side: const BorderSide(color: Colors.white),
                       title: const Text(
@@ -159,9 +179,13 @@ class _PerfilState extends State<Perfil> {
                     ),
                   ),
                 ),
-                FractionallySizedBox(
-                  widthFactor: 0.8,
-                  child: Container(
+                Container(
+                  constraints: const BoxConstraints(
+                    maxWidth:
+                        1000, // Ajusta la altura mínima según tus necesidades
+                  ),
+                  child: FractionallySizedBox(
+                    widthFactor: 0.8,
                     child: CheckboxListTile(
                       side: const BorderSide(color: Colors.white),
                       title: const Text(

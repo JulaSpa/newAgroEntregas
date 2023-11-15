@@ -122,263 +122,241 @@ class _MyHomePageState extends State<MyHomePage> {
           backgroundColor: Colors.transparent,
           elevation: 0,
           centerTitle: true,
-          toolbarHeight: 60,
+          toolbarHeight: 70,
           iconTheme: const IconThemeData(color: Colors.white),
           automaticallyImplyLeading: false,
         ),
         body: SingleChildScrollView(
-          child: Column(
-            children: [
-              DecoratedBox(
-                decoration: const BoxDecoration(
-                  color: Color.fromRGBO(94, 232, 250,
-                      0.5), // Cambia el color aquí según tu preferencia
-                ),
-                child: Center(
-                  child: Column(
-                    children: <Widget>[
-                      //PERFIL
-                      InkWell(
-                        onTap: () {
-                          Navigator.pushNamed(context, "/perfil");
-                        },
-                        child: Container(
-                          padding: const EdgeInsetsDirectional.fromSTEB(
-                              70, 30, 0, 0),
-                          child: const Row(
-                            children: [
-                              Icon(
-                                Icons.account_circle_outlined,
-                                color: Colors.white,
-                                size: 30,
-                              ),
-                              SizedBox(width: 10),
-                              Text(
-                                "Mi perfil",
-                                style: TextStyle(
-                                  color: Color.fromARGB(255, 252, 250, 250),
-                                  fontSize: 20,
-                                ),
-                              ),
-                            ],
+          child: Container(
+            height: MediaQuery.of(context).size.height,
+            decoration: const BoxDecoration(
+              color: Color.fromRGBO(94, 232, 250,
+                  0.5), // Cambia el color aquí según tu preferencia
+            ),
+            child: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: <Widget>[
+                  //PERFIL
+                  InkWell(
+                    onTap: () {
+                      Navigator.pushNamed(context, "/perfil");
+                    },
+                    child: const FractionallySizedBox(
+                      widthFactor: 0.9,
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.account_circle_outlined,
+                            color: Colors.white,
+                            size: 30,
                           ),
-                        ),
-                      ),
-                      const Padding(
-                        padding: EdgeInsetsDirectional.fromSTEB(40, 25, 40,
-                            25), // Añade relleno solo al lado derecho
-                        child: Divider(
-                          color: Colors.white,
-                          thickness: 1,
-                        ),
-                      ),
-                      //ALERTAS
-                      InkWell(
-                        onTap: () {
-                          Navigator.pushNamed(context, "/alert");
-                        },
-                        child: Container(
-                          padding:
-                              const EdgeInsetsDirectional.fromSTEB(70, 0, 0, 0),
-                          child: const Row(
-                            children: [
-                              Icon(
-                                Icons.campaign,
-                                color: Colors.white,
-                                size: 30,
-                              ),
-                              SizedBox(width: 10),
-                              Text(
-                                "Alertas",
-                                style: TextStyle(
-                                  color: Color.fromARGB(255, 252, 250, 250),
-                                  fontSize: 20,
-                                ),
-                              ),
-                            ],
+                          Text(
+                            "Mi perfil",
+                            style: TextStyle(
+                              color: Color.fromARGB(255, 252, 250, 250),
+                              fontSize: 20,
+                            ),
                           ),
-                        ),
+                        ],
                       ),
-                      const Padding(
-                        padding: EdgeInsetsDirectional.fromSTEB(40, 25, 40,
-                            25), // Añade relleno solo al lado derecho
-                        child: Divider(
-                          color: Colors.white,
-                          thickness: 1,
-                        ),
-                      ),
-                      //EN POSICIÓN
-                      InkWell(
-                        onTap: () {
-                          Navigator.pushNamed(context, "/position");
-                        },
-                        child: Container(
-                          padding:
-                              const EdgeInsetsDirectional.fromSTEB(70, 0, 0, 0),
-                          child: const Row(
-                            children: [
-                              Icon(
-                                Icons.location_on,
-                                color: Colors.white,
-                                size: 30,
-                              ),
-                              SizedBox(width: 10),
-                              Text(
-                                "En posición",
-                                style: TextStyle(
-                                  color: Color.fromARGB(255, 252, 250, 250),
-                                  fontSize: 20,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      const Padding(
-                        padding: EdgeInsetsDirectional.fromSTEB(40, 25, 40,
-                            25), // Añade relleno solo al lado derecho
-                        child: Divider(
-                          color: Colors.white,
-                          thickness: 1,
-                        ),
-                      ),
-                      //HISTÓRICO
-                      InkWell(
-                        onTap: () {
-                          Navigator.pushNamed(context, "/historic");
-                        },
-                        child: Container(
-                          padding:
-                              const EdgeInsetsDirectional.fromSTEB(70, 0, 0, 0),
-                          child: const Row(
-                            children: [
-                              Icon(
-                                Icons.description,
-                                color: Colors.white,
-                                size: 30,
-                              ),
-                              SizedBox(width: 10),
-                              Text(
-                                "Histórico CP",
-                                style: TextStyle(
-                                  color: Color.fromARGB(255, 252, 250, 250),
-                                  fontSize: 20,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      const Padding(
-                        padding: EdgeInsetsDirectional.fromSTEB(40, 25, 40,
-                            25), // Añade relleno solo al lado derecho
-                        child: Divider(
-                          color: Colors.white,
-                          thickness: 1,
-                        ),
-                      ),
-                      //HERRAMIENTAS
-                      InkWell(
-                        onTap: () {
-                          Navigator.pushNamed(context, "/tool");
-                        },
-                        child: Container(
-                          padding:
-                              const EdgeInsetsDirectional.fromSTEB(70, 0, 0, 0),
-                          child: const Row(
-                            children: [
-                              Icon(
-                                Icons.build,
-                                color: Colors.white,
-                                size: 30,
-                              ),
-                              SizedBox(width: 10),
-                              Text(
-                                "Herramientas",
-                                style: TextStyle(
-                                  color: Color.fromARGB(255, 252, 250, 250),
-                                  fontSize: 20,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      const Padding(
-                        padding: EdgeInsetsDirectional.fromSTEB(40, 25, 40,
-                            25), // Añade relleno solo al lado derecho
-                        child: Divider(
-                          color: Colors.white,
-                          thickness: 1,
-                        ),
-                      ),
-                      //WHATSAPP
-                      InkWell(
-                        /* onTap: () {
-                              Navigator.pushNamed(context, "/tool");
-                            }, */
-                        child: Container(
-                          padding:
-                              const EdgeInsetsDirectional.fromSTEB(70, 0, 0, 0),
-                          child: const Row(
-                            children: [
-                              Icon(
-                                Icons.call,
-                                color: Colors.white,
-                                size: 30,
-                              ),
-                              SizedBox(width: 10),
-                              Text(
-                                "WhatsApp",
-                                style: TextStyle(
-                                  color: Color.fromARGB(255, 252, 250, 250),
-                                  fontSize: 20,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      const Padding(
-                        padding: EdgeInsetsDirectional.fromSTEB(40, 25, 40,
-                            25), // Añade relleno solo al lado derecho
-                        child: Divider(
-                          color: Colors.white,
-                          thickness: 1,
-                        ),
-                      ),
-                      //CERRAR SESIÓN
-                      InkWell(
-                        onTap: () {
-                          Navigator.pushNamed(context, "/inicio");
-                        },
-                        child: Container(
-                          padding:
-                              const EdgeInsetsDirectional.fromSTEB(70, 0, 0, 0),
-                          child: const Row(
-                            children: [
-                              Icon(
-                                Icons.close,
-                                color: Colors.white,
-                                size: 30,
-                              ),
-                              SizedBox(width: 10),
-                              Text(
-                                "Cerrar sesión",
-                                style: TextStyle(
-                                  color: Color.fromARGB(255, 252, 250, 250),
-                                  fontSize: 20,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ],
+                    ),
                   ),
-                ),
+                  const FractionallySizedBox(
+                    widthFactor: 0.9,
+                    child: Divider(
+                      color: Colors.white,
+                      thickness: 1,
+                    ),
+                  ),
+
+                  //ALERTAS
+                  InkWell(
+                    onTap: () {
+                      Navigator.pushNamed(context, "/alert");
+                    },
+                    child: const FractionallySizedBox(
+                      widthFactor: 0.9,
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.campaign,
+                            color: Colors.white,
+                            size: 30,
+                          ),
+                          Text(
+                            "Alertas",
+                            style: TextStyle(
+                              color: Color.fromARGB(255, 252, 250, 250),
+                              fontSize: 20,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const FractionallySizedBox(
+                    widthFactor: 0.9,
+                    child: Divider(
+                      color: Colors.white,
+                      thickness: 1,
+                    ),
+                  ),
+                  //EN POSICIÓN
+                  InkWell(
+                    onTap: () {
+                      Navigator.pushNamed(context, "/position");
+                    },
+                    child: const FractionallySizedBox(
+                      widthFactor: 0.9,
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.location_on,
+                            color: Colors.white,
+                            size: 30,
+                          ),
+                          Text(
+                            "En posición",
+                            style: TextStyle(
+                              color: Color.fromARGB(255, 252, 250, 250),
+                              fontSize: 20,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const FractionallySizedBox(
+                    widthFactor: 0.9,
+                    child: Divider(
+                      color: Colors.white,
+                      thickness: 1,
+                    ),
+                  ),
+                  //HISTÓRICO
+                  InkWell(
+                    onTap: () {
+                      Navigator.pushNamed(context, "/historic");
+                    },
+                    child: const FractionallySizedBox(
+                      widthFactor: 0.9,
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.description,
+                            color: Colors.white,
+                            size: 30,
+                          ),
+                          Text(
+                            "Histórico CP",
+                            style: TextStyle(
+                              color: Color.fromARGB(255, 252, 250, 250),
+                              fontSize: 20,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const FractionallySizedBox(
+                    widthFactor: 0.9,
+                    child: Divider(
+                      color: Colors.white,
+                      thickness: 1,
+                    ),
+                  ),
+                  //HERRAMIENTAS
+                  InkWell(
+                    onTap: () {
+                      Navigator.pushNamed(context, "/tool");
+                    },
+                    child: const FractionallySizedBox(
+                      widthFactor: 0.9,
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.build,
+                            color: Colors.white,
+                            size: 30,
+                          ),
+                          Text(
+                            "Herramientas",
+                            style: TextStyle(
+                              color: Color.fromARGB(255, 252, 250, 250),
+                              fontSize: 20,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const FractionallySizedBox(
+                    widthFactor: 0.9,
+                    child: Divider(
+                      color: Colors.white,
+                      thickness: 1,
+                    ),
+                  ),
+                  //WHATSAPP
+                  const InkWell(
+                    child: FractionallySizedBox(
+                      widthFactor: 0.9,
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.call,
+                            color: Colors.white,
+                            size: 30,
+                          ),
+                          Text(
+                            "WhatsApp",
+                            style: TextStyle(
+                              color: Color.fromARGB(255, 252, 250, 250),
+                              fontSize: 20,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const FractionallySizedBox(
+                    widthFactor: 0.9,
+                    child: Divider(
+                      color: Colors.white,
+                      thickness: 1,
+                    ),
+                  ),
+                  //CERRAR SESIÓN
+                  InkWell(
+                    onTap: () {
+                      Navigator.pushNamed(context, "/inicio");
+                    },
+                    child: Container(
+                      child: const FractionallySizedBox(
+                        widthFactor: 0.9,
+                        child: Row(
+                          children: [
+                            Icon(
+                              Icons.close,
+                              color: Colors.white,
+                              size: 30,
+                            ),
+                            Text(
+                              "Cerrar sesión",
+                              style: TextStyle(
+                                color: Color.fromARGB(255, 252, 250, 250),
+                                fontSize: 20,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
         ),
         floatingActionButton: Stack(
@@ -403,6 +381,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   print("Body: ${message.body}");
                 } */
               },
+              backgroundColor: Color.fromARGB(255, 37, 211, 102),
               child: const Icon(Icons.message),
             ),
             Positioned(

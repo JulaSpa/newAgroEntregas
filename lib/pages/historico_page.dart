@@ -48,6 +48,7 @@ class _HistoricState extends State<Historic> {
             centerTitle: true,
             toolbarHeight: 60,
             iconTheme: const IconThemeData(color: Colors.white),
+            automaticallyImplyLeading: true,
           ),
           body: DecoratedBox(
             decoration: const BoxDecoration(
@@ -58,10 +59,9 @@ class _HistoricState extends State<Historic> {
                 children: <Widget>[
                   // Campo "desde"
                   Container(
-                    padding:
-                        const EdgeInsetsDirectional.fromSTEB(80, 100, 80, 50),
+                    padding: const EdgeInsets.only(top: 80),
                     child: FractionallySizedBox(
-                      widthFactor: 0.6,
+                      widthFactor: 0.7,
                       child: Container(
                         decoration: const BoxDecoration(
                           border: Border(
@@ -113,9 +113,13 @@ class _HistoricState extends State<Historic> {
                   ),
                   // Campo "hasta"
                   Container(
-                    padding: const EdgeInsetsDirectional.fromSTEB(80, 0, 80, 0),
+                    padding: const EdgeInsets.only(top: 80),
+                    constraints: const BoxConstraints(
+                      minWidth:
+                          1000, // Ajusta la altura mínima según tus necesidades
+                    ),
                     child: FractionallySizedBox(
-                      widthFactor: 0.6,
+                      widthFactor: 0.7,
                       child: Container(
                         decoration: const BoxDecoration(
                           border: Border(
@@ -167,31 +171,34 @@ class _HistoricState extends State<Historic> {
                   ),
                   //BUSCAR
 
-                  FractionallySizedBox(
-                    widthFactor: 0.4,
-                    child: Container(
-                      margin:
-                          const EdgeInsetsDirectional.fromSTEB(170, 50, 170, 0),
-                      decoration: BoxDecoration(
-                          color: Colors.lightBlue,
-                          borderRadius: BorderRadius.circular(20)),
-                      child: ListTile(
-                        title: const Icon(Icons.search),
-                        onTap: () async {
-                          final prefs = await SharedPreferences.getInstance();
-                          if (_selectedFromDate != null &&
-                              _selectedToDate != null) {
-                            await prefs.setString('fromDate',
-                                _selectedFromDate!.toIso8601String());
-                            await prefs.setString(
-                                'toDate', _selectedToDate!.toIso8601String());
-                          }
+                  Container(
+                    constraints:
+                        const BoxConstraints(maxWidth: 400, minWidth: 100),
+                    child: FractionallySizedBox(
+                      widthFactor: 0.2,
+                      child: Container(
+                        margin: const EdgeInsets.only(top: 170),
+                        decoration: BoxDecoration(
+                            color: Colors.lightBlue,
+                            borderRadius: BorderRadius.circular(20)),
+                        child: ListTile(
+                          title: const Icon(Icons.search),
+                          onTap: () async {
+                            final prefs = await SharedPreferences.getInstance();
+                            if (_selectedFromDate != null &&
+                                _selectedToDate != null) {
+                              await prefs.setString('fromDate',
+                                  _selectedFromDate!.toIso8601String());
+                              await prefs.setString(
+                                  'toDate', _selectedToDate!.toIso8601String());
+                            }
 
-                          // Usa el contexto almacenado dentro del contexto asíncrono
-                          Future.microtask(() {
-                            Navigator.pushNamed(context, "/buscar");
-                          });
-                        },
+                            // Usa el contexto almacenado dentro del contexto asíncrono
+                            Future.microtask(() {
+                              Navigator.pushNamed(context, "/buscar");
+                            });
+                          },
+                        ),
                       ),
                     ),
                   ),

@@ -57,14 +57,14 @@ class _Mensajes extends State<Mensajes> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.transparent,
       appBar: AppBar(
         title: Image.asset("lib/images/logoAgroEntregas.png"),
-        backgroundColor: Colors.transparent,
+        backgroundColor: Color.fromARGB(255, 37, 211, 102),
         elevation: 0,
         centerTitle: true,
         toolbarHeight: 60,
         iconTheme: const IconThemeData(color: Colors.white),
+        automaticallyImplyLeading: true,
       ),
       body: Stack(
         children: <Widget>[
@@ -100,6 +100,7 @@ class _Mensajes extends State<Mensajes> {
           );
         },
         child: const Icon(Icons.delete),
+        backgroundColor: Colors.red,
       ),
     );
   }
@@ -119,50 +120,52 @@ class MensajeWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsetsDirectional.fromSTEB(70, 10, 0, 0),
-      child: Container(
-        width: MediaQuery.of(context).size.width * 0.2,
-        child: Card(
-          margin: const EdgeInsets.all(5),
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                for (var i = 0; i < title.length; i++)
-                  Column(
-                    children: [
-                      if (msj == true)
-                        Row(
-                          children: [
-                            const Icon(
-                              Icons.message, // Ícono de burbuja de diálogo
-                              color: Colors.blue, // Color del ícono
-                            ),
-                            SizedBox(width: 8.0),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    title[i],
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                  Text(body[i]),
-                                ],
+    return Container(
+      margin: const EdgeInsetsDirectional.fromSTEB(40, 10, 0, 0),
+      child: Align(
+        alignment: Alignment.centerLeft,
+        child: IntrinsicWidth(
+          child: Card(
+            margin: const EdgeInsets.all(15),
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  for (var i = 0; i < title.length; i++)
+                    Column(
+                      children: [
+                        if (msj == true)
+                          Row(
+                            children: [
+                              const Icon(
+                                Icons.message, // Ícono de burbuja de diálogo
+                                color: Colors.blue, // Color del ícono
                               ),
-                            ),
-                          ],
-                        )
-                      else
-                        const Text("Tienes los mensajes desactivados"),
-                      const SizedBox(height: 1.0),
-                    ],
-                  ),
-              ],
+                              const SizedBox(width: 8.0),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      title[i],
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    Text(body[i]),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          )
+                        else
+                          const Text("Tienes los mensajes desactivados"),
+                        const SizedBox(height: 1.0),
+                      ],
+                    ),
+                ],
+              ),
             ),
           ),
         ),

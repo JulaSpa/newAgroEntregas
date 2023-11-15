@@ -481,20 +481,21 @@ void _showImageDialog(BuildContext context, String base64Image) {
         // Usamos Dialog en lugar de AlertDialog
         backgroundColor:
             Colors.transparent, // Establecemos el fondo transparente
-        child: Container(
-          width: 600, // Ajusta el ancho según tus necesidades
-          height: 600, // Ajusta la altura según tus necesidades
-          decoration: BoxDecoration(
-            image: DecorationImage(
-              image: MemoryImage(base64.decode(base64Image)),
-              fit: BoxFit.contain, // Ajusta la imagen para que se vea completa
+        child: FractionallySizedBox(
+          widthFactor: 0.9,
+          heightFactor: 0.8,
+          child: Container(
+            // Ajusta la altura según tus necesidades
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                image: MemoryImage(base64.decode(base64Image)),
+                // Ajusta la imagen para que se vea completa
+              ),
             ),
-          ),
-          child: Stack(
-            children: <Widget>[
-              Align(
-                alignment: Alignment.topRight,
-                child: Container(
+            child: Stack(
+              children: <Widget>[
+                Align(
+                  alignment: Alignment.topRight,
                   child: TextButton(
                     onPressed: () {
                       Navigator.of(context).pop();
@@ -506,24 +507,24 @@ void _showImageDialog(BuildContext context, String base64Image) {
                     ),
                   ),
                 ),
-              ),
-              Align(
-                alignment: Alignment.topRight,
-                child: Container(
-                  margin: const EdgeInsets.only(right: 50.0),
-                  child: TextButton(
-                    onPressed: () {
-                      _shareImage(base64Image);
-                    },
-                    child: const Icon(
-                      Icons.share, // Icono de cierre
-                      color: Colors.white, // Color del icono
-                      size: 24.0, // Tamaño del icono
+                Align(
+                  alignment: Alignment.topRight,
+                  child: Container(
+                    margin: const EdgeInsets.only(right: 50.0),
+                    child: TextButton(
+                      onPressed: () {
+                        _shareImage(base64Image);
+                      },
+                      child: const Icon(
+                        Icons.share, // Icono de cierre
+                        color: Colors.white, // Color del icono
+                        size: 24.0, // Tamaño del icono
+                      ),
                     ),
                   ),
-                ),
-              )
-            ],
+                )
+              ],
+            ),
           ),
         ),
       );

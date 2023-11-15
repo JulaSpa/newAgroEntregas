@@ -31,6 +31,7 @@ class _Camiones extends State<Camiones> {
           centerTitle: true,
           toolbarHeight: 120,
           iconTheme: const IconThemeData(color: Colors.white),
+          automaticallyImplyLeading: true,
         ),
         body: Center(
           child: Column(
@@ -45,6 +46,7 @@ class _Camiones extends State<Camiones> {
                 ),
               ),
               Container(
+                constraints: BoxConstraints(maxWidth: 1000),
                 width: double.infinity,
                 padding: const EdgeInsetsDirectional.fromSTEB(40, 50, 40, 50),
                 child: TextField(

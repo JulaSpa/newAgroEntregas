@@ -27,8 +27,8 @@ class _Inicio extends State<Inicio> {
           backgroundColor: Colors.transparent,
           elevation: 0,
           centerTitle: true,
-          toolbarHeight:
-              120, // Ajusta la altura del AppBar según tus necesidades
+          toolbarHeight: 70,
+          automaticallyImplyLeading: false,
         ),
         body: Center(
           child: Column(
@@ -37,8 +37,11 @@ class _Inicio extends State<Inicio> {
                   height:
                       10), // Ajusta la distancia vertical según tus necesidades
               Container(
-                width: double.infinity,
-                padding: const EdgeInsetsDirectional.fromSTEB(0, 50, 0, 50),
+                padding: const EdgeInsetsDirectional.fromSTEB(0, 50, 0, 200),
+                constraints: const BoxConstraints(
+                  minWidth:
+                      500, // Ajusta la altura mínima según tus necesidades
+                ),
                 child: const Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -54,7 +57,7 @@ class _Inicio extends State<Inicio> {
               ),
               Container(
                 width: double.infinity,
-                padding: const EdgeInsetsDirectional.fromSTEB(30, 0, 30, 15),
+                constraints: BoxConstraints(minHeight: 40, maxWidth: 1000),
                 child: FractionallySizedBox(
                   widthFactor: 0.5,
                   child: ElevatedButton(
@@ -73,9 +76,10 @@ class _Inicio extends State<Inicio> {
                   ),
                 ),
               ),
+              const SizedBox(height: 25),
               Container(
                 width: double.infinity,
-                padding: const EdgeInsetsDirectional.fromSTEB(30, 0, 30, 0),
+                constraints: BoxConstraints(minHeight: 40, maxWidth: 1000),
                 child: FractionallySizedBox(
                   widthFactor: 0.5,
                   child: ElevatedButton(
