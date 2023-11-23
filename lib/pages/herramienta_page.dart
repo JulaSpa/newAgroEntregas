@@ -285,36 +285,6 @@ class _ToolState extends State<Tool> {
                             ),
                           ),
                         ),
-                        Expanded(
-                          child: GestureDetector(
-                            onTap: () {
-                              launch("https://agroentregas.com.ar");
-                            },
-                            child: Column(
-                              children: [
-                                const Padding(
-                                  padding: EdgeInsets.only(bottom: 0, top: 0),
-                                  child: Icon(
-                                    Icons.edit_document,
-                                    color: Colors.white,
-                                    size: 60,
-                                  ),
-                                ),
-                                Container(
-                                  padding: const EdgeInsets.all(0),
-                                  child: const Text(
-                                    "Confeccion carta de porte",
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
                       ],
                     ),
                   ),

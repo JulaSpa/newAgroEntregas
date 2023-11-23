@@ -12,13 +12,19 @@ class AlertDetails extends StatelessWidget {
     Map<String, Color> colorMap = {
       "RECHAZO": Colors.red,
       "CALADO": Colors.green,
-      "AUTORIZADO": Colors.blue,
+      "AUTORIZADO": const Color.fromARGB(255, 3, 1, 126),
       "POSICION": Colors.lightBlue,
       "DEMORADO": Colors.yellow,
       "EN TRANSITO": Colors.pink,
       "PROBLEMA EN C.P.": Colors.brown,
-      "HABLADO PROBLEMA CP": const Color.fromARGB(255, 80, 48, 73),
-      "DESCARGADO": const Color.fromARGB(255, 2, 99, 5)
+      "HABLADO PROBLEMA CP": const Color.fromARGB(255, 176, 39, 96),
+      "DESCARGADO": const Color.fromARGB(255, 2, 99, 5),
+      "SIN CUPO": Colors.green,
+      "SOLICITA RECHAZO": Colors.purple,
+      "HABLADO": const Color.fromARGB(255, 176, 39, 96),
+      "HABLADO RECHAZO": const Color.fromARGB(255, 176, 39, 96),
+      "HABLADO SIN CUPO": const Color.fromARGB(255, 176, 39, 96),
+      "DESVIADO": Colors.black
     };
 
     Color backgroundColor = colorMap[sit] ?? Colors.grey;
@@ -61,9 +67,38 @@ class AlertDetails extends StatelessWidget {
                           padding: const EdgeInsetsDirectional.fromSTEB(
                               35, 10, 5, 10),
                           child: Icon(
-                            (sit == "RECHAZO" || sit == "RECHAZADO")
+                            (album.idSit == "RCZO")
                                 ? Icons.cancel
-                                : Icons.check,
+                                : (album.idSit == "AUTO")
+                                    ? Icons.check
+                                    : (album.idSit == "DEMO")
+                                        ? Icons.access_time
+                                        : (album.idSit == "PECP")
+                                            ? Icons.change_history
+                                            : (album.idSit == "SCUP")
+                                                ? Icons.stop_circle
+                                                : (album.idSit == "SRZO")
+                                                    ? Icons.change_history
+                                                    : (album.idSit == "HABL")
+                                                        ? Icons.check
+                                                        : (album.idSit ==
+                                                                "HRZO")
+                                                            ? Icons
+                                                                .change_history
+                                                            : (album.idSit ==
+                                                                    "HPCP")
+                                                                ? Icons
+                                                                    .change_history
+                                                                : (album.idSit ==
+                                                                        "HSCU")
+                                                                    ? Icons
+                                                                        .stop_circle
+                                                                    : (album.idSit ==
+                                                                            "DESC")
+                                                                        ? Icons
+                                                                            .check
+                                                                        : Icons
+                                                                            .change_history,
                             color: Colors.white,
                             size: 30,
                           ),

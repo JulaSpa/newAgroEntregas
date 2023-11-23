@@ -58,7 +58,7 @@ class _AlertState extends State<Alert> {
     };
     final response = await http.post(
       Uri.parse(
-        'http://sapp.agroentregas.com.ar/RestServiceImpl.svc/Alertas',
+        'http://net.entreganet.com/RestServiceImpl.svc/Alertas',
       ),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
@@ -132,14 +132,18 @@ class _AlertState extends State<Alert> {
                             Map<String, Color> colorMap = {
                               "RECHAZO": Colors.red,
                               "CALADO": Colors.green,
-                              "AUTORIZADO": Colors.blue,
+                              "AUTORIZADO":
+                                  const Color.fromARGB(255, 3, 1, 126),
                               "POSICION": Colors.lightBlue,
                               "DEMORADO": Colors.yellow,
                               "EN TRANSITO": Colors.pink,
                               "PROBLEMA EN C.P.": Colors.brown,
                               "HABLADO PROBLEMA CP":
                                   const Color.fromARGB(255, 80, 48, 73),
-                              "DESCARGADO": const Color.fromARGB(255, 2, 99, 5)
+                              "DESCARGADO": const Color.fromARGB(255, 2, 99, 5),
+                              "SIN CUPO": Colors.green,
+                              "SOLICITA RECHAZO": Colors.purple,
+                              "HABLADO": const Color.fromARGB(255, 176, 39, 96)
                             };
 
                             Color backgroundColor =
@@ -171,10 +175,26 @@ class _AlertState extends State<Alert> {
                                           padding: const EdgeInsetsDirectional
                                               .fromSTEB(35, 10, 5, 10),
                                           child: Icon(
-                                            (rech == "RECHAZO" ||
-                                                    rech == "RECHAZADO")
+                                            (album.idSit == "RCZO")
                                                 ? Icons.cancel
-                                                : Icons.check,
+                                                : (album.idSit == "AUTO")
+                                                    ? Icons.check
+                                                    : (album.idSit == "DEMO")
+                                                        ? Icons.access_time
+                                                        : (album.idSit ==
+                                                                "PECP")
+                                                            ? Icons
+                                                                .change_history
+                                                            : (album.idSit ==
+                                                                    "SCUP")
+                                                                ? Icons
+                                                                    .stop_circle
+                                                                : (album.idSit ==
+                                                                        "HABL")
+                                                                    ? Icons
+                                                                        .check
+                                                                    : Icons
+                                                                        .change_history,
                                             color: Colors.white,
                                             size: 30,
                                           ),
@@ -203,6 +223,7 @@ class _AlertState extends State<Alert> {
                                                     context,
                                                     album.idFl,
                                                     album.nroCP,
+                                                    album.idSit,
                                                     rech);
                                               }
                                             },
@@ -420,8 +441,8 @@ class _AlertState extends State<Alert> {
   }
 }
 
-void _showOptionsModal(
-    BuildContext context, String? uid, String? nroCP, String? rech) {
+void _showOptionsModal(BuildContext context, String? uid, String? nroCP,
+    String? idSit, String? rech) {
   print(uid);
 
   showModalBottomSheet(
@@ -432,12 +453,49 @@ void _showOptionsModal(
         color: const Color.fromARGB(255, 17, 34, 71),
         child: Center(
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Row(
                 mainAxisAlignment: MainAxisAlignment
                     .spaceEvenly, // Distribuye uniformemente los elementos
                 children: [
+                  if (idSit == "RCZO" || idSit == "DEMO")
+                    // RECHAZO CGT O AUTORIZAR O NULL
+                    Expanded(
+                      child: Column(
+                        children: [
+                          IconButton(
+                            onPressed: () {
+                              if (idSit == "RCZO") {
+                                // Acción para la opción api rechazo cgt
+                                _rechazo(context, uid, nroCP, idSit);
+                              } else if (idSit == "DEMO") {
+                                // Acción para api autorizar
+                                _autorizado(context, uid, nroCP, idSit);
+                              } else {
+                                null;
+                              }
+                            },
+                            icon: Icon(
+                              idSit == "RCZO"
+                                  ? Icons.cancel
+                                  : (idSit == "DEMO" ? Icons.check : null),
+                              color: Colors.white,
+                            ),
+                            color: Colors.white,
+                          ),
+                          Text(
+                            idSit == "RCZO"
+                                ? "Pedir rechazo de CGT"
+                                : idSit == "DEMO"
+                                    ? "Autorizar"
+                                    : "", // Cambia el texto según el valor de 'rech'
+                            style: const TextStyle(
+                                fontSize: 10, color: Colors.white),
+                          ),
+                        ],
+                      ),
+                    ),
+
                   // LLAMADA
                   Expanded(
                     child: Column(
@@ -451,73 +509,26 @@ void _showOptionsModal(
                           color: Colors.white,
                         ),
                         const Text(
-                          "Llamada o WhatsApp",
+                          "Solicitar llamada",
                           style: TextStyle(fontSize: 10, color: Colors.white),
                         ),
                       ],
                     ),
                   ),
-                  // RECHAZO CGT O AUTORIZAR
-                  Expanded(
-                    child: Column(
-                      children: [
-                        IconButton(
-                          onPressed: () {
-                            if (rech == "RECHAZO" || rech == "RECHAZADO") {
-                              // Acción para la opción api rechazo cgt
-                              _rechazo(context, uid, nroCP);
-                            } else {
-                              // Acción para api autorizar
-                              _autorizado(context, uid, nroCP);
-                            }
-                          },
-                          icon: rech == "RECHAZO" || rech == "RECHAZADO"
-                              ? const Icon(Icons.cancel)
-                              : const Icon(Icons.check),
-                          color: Colors.white,
-                        ),
-                        Text(
-                          rech == "RECHAZO" || rech == "RECHAZADO"
-                              ? "Pedir rechazo de CGT"
-                              : "Autorizar", // Cambia el texto según el valor de 'rech'
-                          style: const TextStyle(
-                              fontSize: 10, color: Colors.white),
-                        ),
-                      ],
-                    ),
-                  ),
+
                   // LEIDO
                   Expanded(
                     child: Column(
                       children: [
                         IconButton(
                           onPressed: () {
-                            _leido(context, uid, nroCP);
+                            _leido(context, uid, nroCP, idSit);
                           },
                           icon: const Icon(Icons.visibility),
                           color: Colors.white,
                         ),
                         const Text(
                           "Leido",
-                          style: TextStyle(fontSize: 10, color: Colors.white),
-                        ),
-                      ],
-                    ),
-                  ),
-                  // COMPARTIR
-                  Expanded(
-                    child: Column(
-                      children: [
-                        IconButton(
-                          onPressed: () {
-                            Navigator.pop(context); // Cierra el modal
-                            // Acción para la opción 4
-                          },
-                          icon: const Icon(Icons.share),
-                          color: Colors.white,
-                        ),
-                        const Text(
-                          "Compartir",
                           style: TextStyle(fontSize: 10, color: Colors.white),
                         ),
                       ],
@@ -551,7 +562,7 @@ Future<void> _llamada(context, String? uid, String? nroCP) async {
   final requestData = {
     'usuario': username,
     'contraseña': password,
-    "NroCP": nroCP,
+    "nrocp": nroCP,
     "imei": imei,
     "numero": nroCel,
     "dispositivo": dispositivo,
@@ -560,7 +571,7 @@ Future<void> _llamada(context, String? uid, String? nroCP) async {
   print(requestData);
   final response = await http.post(
     Uri.parse(
-      'http://sapp.agroentregas.com.ar/RestServiceImpl.svc/Llamada',
+      'http://net.entreganet.com/RestServiceImpl.svc/Llamada',
     ),
     headers: <String, String>{
       'Content-Type': 'application/json; charset=UTF-8',
@@ -599,8 +610,8 @@ void _showResponseModal(BuildContext context, String responseBody) {
 }
 
 //API RECHAZO
-Future<void> _rechazo(context, String? uid, String? nroCP) async {
-  final GlobalKey<_AlertState> alertKey = GlobalKey<_AlertState>();
+Future<void> _rechazo(
+    context, String? uid, String? nroCP, String? idSit) async {
   DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
   AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
 
@@ -617,11 +628,11 @@ Future<void> _rechazo(context, String? uid, String? nroCP) async {
   final requestData = {
     'usuario': username,
     'contraseña': password,
-    "NroCP": nroCP,
+    "nrocp": nroCP,
     "imei": imei,
     "numero": nroCel,
     "dispositivo": dispositivo,
-    "Situacion": "Solicito Rechazo CGT",
+    "situacion": idSit,
     "idfl": uid
   };
   print(requestData);
@@ -638,14 +649,23 @@ Future<void> _rechazo(context, String? uid, String? nroCP) async {
   );
   if (response.statusCode == 200) {
     print(response.body);
-    alertKey.currentState?._loadAlbumData();
+
+    // Navegar a /home
+    Navigator.pushNamed(context, "/home");
+
+    // Esperar unos segundos (opcional)
+    await Future.delayed(const Duration(milliseconds: 300));
+
+    // Navegar a /alert
+    Navigator.pushNamed(context, "/alert");
   } else {
     throw Exception('Failed to send llamada');
   }
 }
 
 //API AUTORIZADO
-Future<void> _autorizado(context, String? uid, String? nroCP) async {
+Future<void> _autorizado(
+    context, String? uid, String? nroCP, String? idSit) async {
   DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
   AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
 
@@ -662,11 +682,11 @@ Future<void> _autorizado(context, String? uid, String? nroCP) async {
   final requestData = {
     'usuario': username,
     'contraseña': password,
-    "NroCP": nroCP,
+    "nrocp": nroCP,
     "imei": imei,
     "numero": nroCel,
     "dispositivo": dispositivo,
-    "Situacion": "Autorizar",
+    "nota": idSit,
     "idfl": uid
   };
   print(requestData);
@@ -683,13 +703,22 @@ Future<void> _autorizado(context, String? uid, String? nroCP) async {
   );
   if (response.statusCode == 200) {
     print(response.body);
+
+    // Navegar a /home
+    Navigator.pushNamed(context, "/home");
+
+    // Esperar unos segundos (opcional)
+    await Future.delayed(const Duration(milliseconds: 300));
+
+    // Navegar a /alert
+    Navigator.pushNamed(context, "/alert");
   } else {
     throw Exception('Failed to send llamada');
   }
 }
 
 //LEIDO
-Future<void> _leido(context, String? uid, String? nroCP) async {
+Future<void> _leido(context, String? uid, String? nroCP, String? idSit) async {
   DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
   AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
 
@@ -706,11 +735,11 @@ Future<void> _leido(context, String? uid, String? nroCP) async {
   final requestData = {
     'usuario': username,
     'contraseña': password,
-    "NroCP": nroCP,
+    "nrocp": nroCP,
     "imei": imei,
     "numero": nroCel,
     "dispositivo": dispositivo,
-    "Situacion": "Leido",
+    "situacion": idSit,
     "idfl": uid
   };
   print(requestData);
@@ -727,6 +756,15 @@ Future<void> _leido(context, String? uid, String? nroCP) async {
   );
   if (response.statusCode == 200) {
     print(response.body);
+
+    // Navegar a /home
+    Navigator.pushNamed(context, "/home");
+
+    // Esperar unos segundos (opcional)
+    await Future.delayed(const Duration(milliseconds: 300));
+
+    // Navegar a /alert
+    Navigator.pushNamed(context, "/alert");
   } else {
     throw Exception('Failed to send llamada');
   }

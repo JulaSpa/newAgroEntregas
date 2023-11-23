@@ -59,7 +59,7 @@ class _Mensajes extends State<Mensajes> {
     return Scaffold(
       appBar: AppBar(
         title: Image.asset("lib/images/logoAgroEntregas.png"),
-        backgroundColor: Color.fromARGB(255, 37, 211, 102),
+        backgroundColor: Colors.blue,
         elevation: 0,
         centerTitle: true,
         toolbarHeight: 60,
@@ -83,7 +83,6 @@ class _Mensajes extends State<Mensajes> {
                   MensajeWidget(
                     title: message.title,
                     body: message.body,
-                    msj: msjC,
                   ),
               ],
             ),
@@ -92,11 +91,35 @@ class _Mensajes extends State<Mensajes> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          // Acción que se realiza al presionar el botón flotante
-          // MANEJO DE NOTIFICACIONES
-          Navigator.pushNamed(
-            context,
-            "/home",
+          // Mostrar el cuadro de diálogo de confirmación
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: const Text("Confirmación"),
+                content: const Text(
+                    "¿Estás seguro de que deseas eliminar los mensajes?"),
+                actions: [
+                  // Botón para cancelar
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: const Text("Cancelar"),
+                  ),
+                  // Botón para confirmar y navegar a /home
+                  TextButton(
+                    onPressed: () {
+                      // Acción que se realiza al confirmar
+                      Navigator.of(context)
+                          .pop(); // Cerrar el cuadro de diálogo
+                      Navigator.pushNamed(context, "/home");
+                    },
+                    child: const Text("Confirmar"),
+                  ),
+                ],
+              );
+            },
           );
         },
         child: const Icon(Icons.delete),
@@ -109,13 +132,11 @@ class _Mensajes extends State<Mensajes> {
 class MensajeWidget extends StatelessWidget {
   final List<String> title;
   final List<String> body;
-  final bool? msj;
 
   const MensajeWidget({
     Key? key,
     required this.title,
     required this.body,
-    required this.msj,
   }) : super(key: key);
 
   @override
@@ -135,33 +156,29 @@ class MensajeWidget extends StatelessWidget {
                   for (var i = 0; i < title.length; i++)
                     Column(
                       children: [
-                        if (msj == true)
-                          Row(
-                            children: [
-                              const Icon(
-                                Icons.message, // Ícono de burbuja de diálogo
-                                color: Colors.blue, // Color del ícono
-                              ),
-                              const SizedBox(width: 8.0),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      title[i],
-                                      style: const TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                      ),
+                        Row(
+                          children: [
+                            const Icon(
+                              Icons.message, // Ícono de burbuja de diálogo
+                              color: Colors.blue, // Color del ícono
+                            ),
+                            const SizedBox(width: 8.0),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    title[i],
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
                                     ),
-                                    Text(body[i]),
-                                  ],
-                                ),
+                                  ),
+                                  Text(body[i]),
+                                ],
                               ),
-                            ],
-                          )
-                        else
-                          const Text("Tienes los mensajes desactivados"),
-                        const SizedBox(height: 1.0),
+                            ),
+                          ],
+                        )
                       ],
                     ),
                 ],

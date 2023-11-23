@@ -13,20 +13,27 @@ import 'package:flutter_application_1/pages/camionesCP_page.dart';
 import 'package:flutter_application_1/pages/camionesbusq_page.dart';
 import 'package:flutter_application_1/pages/mensajes_page.dart';
 import 'package:flutter_application_1/src/providers.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() async {
-  runApp(const MyApp());
+  WidgetsFlutterBinding.ensureInitialized();
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  bool? logI = prefs.getBool('logInOut');
+
+  runApp(MyApp(logI: logI));
+  /*  runApp(const MyApp()); */
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final bool? logI;
 
-  // This widget is the root of your application.
+  const MyApp({Key? key, this.logI}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Flutter Demo',
-      initialRoute: "/inicio",
+      initialRoute: logI == false || logI == null ? '/inicio' : '/home',
       onGenerateRoute: (settings) {
         if (settings.name == '/mensajes') {
           // Si la ruta es "/mensajes", extrae los argumentos y crea la página

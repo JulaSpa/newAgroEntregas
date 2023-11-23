@@ -9,6 +9,8 @@ import 'package:path_provider/path_provider.dart';
 import 'package:flutter/services.dart';
 import 'dart:io';
 import 'package:flutter_application_1/pages/detalles_page.dart';
+import 'package:photo_view/photo_view.dart';
+import 'package:photo_view/photo_view_gallery.dart';
 
 class Position extends StatefulWidget {
   const Position({super.key});
@@ -62,7 +64,7 @@ class _PositionState extends State<Position> {
     };
     final response = await http.post(
       Uri.parse(
-        'http://sapp.agroentregas.com.ar/RestServiceImpl.svc/Posicion',
+        'http://net.entreganet.com/RestServiceImpl.svc/Posicion',
       ),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
@@ -137,14 +139,23 @@ class _PositionState extends State<Position> {
                             Map<String, Color> colorMap = {
                               "RECHAZO": Colors.red,
                               "CALADO": Colors.green,
-                              "AUTORIZADO": Colors.blue,
+                              "AUTORIZADO":
+                                  const Color.fromARGB(255, 3, 1, 126),
                               "POSICION": Colors.lightBlue,
                               "DEMORADO": Colors.yellow,
                               "EN TRANSITO": Colors.pink,
                               "PROBLEMA EN C.P.": Colors.brown,
                               "HABLADO PROBLEMA CP":
-                                  const Color.fromARGB(255, 80, 48, 73),
-                              "DESCARGADO": const Color.fromARGB(255, 2, 99, 5)
+                                  const Color.fromARGB(255, 176, 39, 96),
+                              "DESCARGADO": const Color.fromARGB(255, 2, 99, 5),
+                              "SIN CUPO": Colors.green,
+                              "SOLICITA RECHAZO": Colors.purple,
+                              "HABLADO": const Color.fromARGB(255, 176, 39, 96),
+                              "HABLADO RECHAZO":
+                                  const Color.fromARGB(255, 176, 39, 96),
+                              "HABLADO SIN CUPO":
+                                  const Color.fromARGB(255, 176, 39, 96),
+                              "DESVIADO": Colors.black
                             };
 
                             Color backgroundColor =
@@ -160,10 +171,37 @@ class _PositionState extends State<Position> {
                                         padding: const EdgeInsetsDirectional
                                             .fromSTEB(35, 10, 5, 10),
                                         child: Icon(
-                                          (rech == "RECHAZO" ||
-                                                  rech == "RECHAZADO")
+                                          (album.idSit == "RCZO")
                                               ? Icons.cancel
-                                              : Icons.check,
+                                              : (album.idSit == "AUTO")
+                                                  ? Icons.check
+                                                  : (album.idSit == "DEMO")
+                                                      ? Icons.access_time
+                                                      : (album.idSit == "PECP")
+                                                          ? Icons.change_history
+                                                          : (album.idSit ==
+                                                                  "SCUP")
+                                                              ? Icons
+                                                                  .stop_circle
+                                                              : (album.idSit ==
+                                                                      "SRZO")
+                                                                  ? Icons
+                                                                      .change_history
+                                                                  : (album.idSit ==
+                                                                          "HABL")
+                                                                      ? Icons
+                                                                          .check
+                                                                      : (album.idSit ==
+                                                                              "HRZO")
+                                                                          ? Icons
+                                                                              .change_history
+                                                                          : (album.idSit == "HPCP")
+                                                                              ? Icons.change_history
+                                                                              : (album.idSit == "HSCU")
+                                                                                  ? Icons.stop_circle
+                                                                                  : (album.idSit == "DESC")
+                                                                                      ? Icons.check
+                                                                                      : Icons.change_history,
                                           color: Colors.white,
                                           size: 30,
                                         ),
@@ -447,12 +485,12 @@ void _downLoad(
   final requestData = {
     'usuario': username,
     'contraseña': password,
-    'NroCP': nroCP
+    'nrocp': nroCP
   };
   /* print(requestData); */
 
   final response = await http.post(
-    Uri.parse('http://sapp.agroentregas.com.ar/RestServiceImpl.svc/Imagen'),
+    Uri.parse('http://net.entreganet.com/RestServiceImpl.svc/Imagen'),
     headers: <String, String>{
       'Content-Type': 'application/json; charset=UTF-8',
     },
@@ -478,54 +516,55 @@ void _showImageDialog(BuildContext context, String base64Image) {
     context: context,
     builder: (context) {
       return Dialog(
-        // Usamos Dialog en lugar de AlertDialog
-        backgroundColor:
-            Colors.transparent, // Establecemos el fondo transparente
-        child: FractionallySizedBox(
-          widthFactor: 0.9,
-          heightFactor: 0.8,
-          child: Container(
-            // Ajusta la altura según tus necesidades
-            decoration: BoxDecoration(
-              image: DecorationImage(
-                image: MemoryImage(base64.decode(base64Image)),
-                // Ajusta la imagen para que se vea completa
+        backgroundColor: Colors.transparent,
+        child: Stack(
+          children: [
+            PhotoViewGallery.builder(
+              itemCount: 1,
+              builder: (context, index) {
+                return PhotoViewGalleryPageOptions(
+                  imageProvider: MemoryImage(base64.decode(base64Image)),
+                  minScale: PhotoViewComputedScale.contained,
+                  maxScale: PhotoViewComputedScale.covered * 2,
+                  heroAttributes: PhotoViewHeroAttributes(tag: index),
+                );
+              },
+              scrollPhysics: const BouncingScrollPhysics(),
+              backgroundDecoration: const BoxDecoration(
+                color: Colors.transparent,
+              ),
+              pageController: PageController(),
+            ),
+            Align(
+              alignment: Alignment.topRight,
+              child: TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: const Icon(
+                  Icons.close, // Icono de cierre
+                  color: Colors.white, // Color del icono
+                  size: 24.0, // Tamaño del icono
+                ),
               ),
             ),
-            child: Stack(
-              children: <Widget>[
-                Align(
-                  alignment: Alignment.topRight,
-                  child: TextButton(
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                    child: const Icon(
-                      Icons.close, // Icono de cierre
-                      color: Colors.white, // Color del icono
-                      size: 24.0, // Tamaño del icono
-                    ),
+            Align(
+              alignment: Alignment.topRight,
+              child: Container(
+                margin: const EdgeInsets.only(right: 50.0),
+                child: TextButton(
+                  onPressed: () {
+                    _shareImage(base64Image);
+                  },
+                  child: const Icon(
+                    Icons.share, // Icono de cierre
+                    color: Colors.white, // Color del icono
+                    size: 24.0, // Tamaño del icono
                   ),
                 ),
-                Align(
-                  alignment: Alignment.topRight,
-                  child: Container(
-                    margin: const EdgeInsets.only(right: 50.0),
-                    child: TextButton(
-                      onPressed: () {
-                        _shareImage(base64Image);
-                      },
-                      child: const Icon(
-                        Icons.share, // Icono de cierre
-                        color: Colors.white, // Color del icono
-                        size: 24.0, // Tamaño del icono
-                      ),
-                    ),
-                  ),
-                )
-              ],
-            ),
-          ),
+              ),
+            )
+          ],
         ),
       );
     },

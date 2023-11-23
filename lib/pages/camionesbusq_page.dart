@@ -47,11 +47,11 @@ class _CamionesBusq extends State<CamionesBusq> {
 
   Future<List<Album>> fetchAlbum() async {
     final requestData = {
-      'NroCP': nroCPSrch,
+      'nrocp': nroCPSrch,
     };
     final response = await http.post(
       Uri.parse(
-        'http://sapp.agroentregas.com.ar/RestServiceImpl.svc/CamioneroCP',
+        'http://net.entreganet.com/RestServiceImpl.svc/CamioneroCP',
       ),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',

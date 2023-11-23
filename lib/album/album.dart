@@ -14,24 +14,25 @@ class Album {
   final String nombreMe;
   final String chasisFl;
   final String acopreFl;
+  final String idSit;
 
-  const Album({
-    required this.nroCP,
-    required this.nombreSit,
-    required this.xtitular,
-    required this.nombrePrc,
-    required this.xintermediario,
-    required this.xcorredor,
-    required this.observacionesana,
-    required this.xdestinatario,
-    required this.xdestino,
-    required this.idFl,
-    required this.fechaSistema,
-    required this.imagen,
-    required this.nombreMe,
-    required this.chasisFl,
-    required this.acopreFl,
-  });
+  const Album(
+      {required this.nroCP,
+      required this.nombreSit,
+      required this.xtitular,
+      required this.nombrePrc,
+      required this.xintermediario,
+      required this.xcorredor,
+      required this.observacionesana,
+      required this.xdestinatario,
+      required this.xdestino,
+      required this.idFl,
+      required this.fechaSistema,
+      required this.imagen,
+      required this.nombreMe,
+      required this.chasisFl,
+      required this.acopreFl,
+      required this.idSit});
 
   factory Album.fromJson(Map<String, dynamic> json) {
     return Album(
@@ -50,6 +51,7 @@ class Album {
       nombreMe: json["nombreMe"] ?? '',
       chasisFl: json["chasisFl"] ?? '',
       acopreFl: json["acopreFl"] ?? '',
+      idSit: json["idSit"] ?? '',
     );
   }
 }

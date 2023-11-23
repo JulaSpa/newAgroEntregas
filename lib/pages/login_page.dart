@@ -16,10 +16,13 @@ class _LoginState extends State<Login> {
   var myController = TextEditingController();
   var pass = TextEditingController();
 
+  //Log
+  bool logInOut = false;
+
   //recordar usuario y contraseña
   bool isChecked = false;
   //aceptar términos y condiciones
-  bool readCheck = false;
+  bool readCheck = true;
   @override
   void initState() {
     super.initState();
@@ -200,7 +203,8 @@ class _LoginState extends State<Login> {
                           final prefs = await SharedPreferences.getInstance();
                           await prefs.setString('username', username);
                           await prefs.setString('password', password);
-
+// Cambiar el valor de logInOut a true y guardarlo en SharedPreferences
+                          await prefs.setBool('logInOut', true);
                           Navigator.pushNamed(
                             context,
                             "/home",
