@@ -26,11 +26,12 @@ class _MyHomePageState extends State<MyHomePage> {
   String isAccesoTrue = "";
   bool isLoading = true;
   List<MensajesArguments>? lastMessage;
+  List<MensajesArguments>? lastm;
   List<dynamic>? alertas;
   List<dynamic>? posicion;
   late PushNotProv pushNotProv;
   bool firebaseInitialized = false;
-
+  List? title;
   @override
   void initState() {
     super.initState();
@@ -42,7 +43,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
     WidgetsFlutterBinding.ensureInitialized();
     // Inicializa Firebase de manera asíncrona y espera a que esté listo
-    Firebase.initializeApp().then((_) {
+    Firebase.initializeApp().then((_) async {
       // La inicialización de Firebase se ha completado
       pushNotProv = PushNotProv();
       // ENVIA TOKEN A FIREBASE
@@ -50,11 +51,27 @@ class _MyHomePageState extends State<MyHomePage> {
       setState(() {
         firebaseInitialized = true; // Marca que Firebase se ha inicializado
       });
-      pushNotProv.mensajes.listen((List<MensajesArguments> messages) {
+      pushNotProv.mensajes.listen((List<MensajesArguments> messages) async {
         setState(() {
           lastMessage = messages;
         });
       });
+
+      /* if (lastMessage != null && lastMessage!.isNotEmpty) {
+        // Recupera la lista actual de títulos de SharedPreferences
+        final prefs = await SharedPreferences.getInstance();
+        List storedTitles = prefs.getStringList("m") ?? [];
+
+        // Agrega los nuevos títulos a la lista
+        for (var mensaje in lastMessage!) {
+          storedTitles.add(mensaje.title);
+        }
+
+        // Guarda la lista actualizada en SharedPreferences
+        for (var msjs in storedTitles) {
+          await prefs.setStringList("m", msjs);
+        }
+      } */
     }).catchError((error) {
       print("Error al inicializar Firebase: $error");
     });
@@ -62,8 +79,8 @@ class _MyHomePageState extends State<MyHomePage> {
 
     print("last message");
     print(lastMessage?.length);
-
-    /* print("pushNotProv: $pushNotProv"); */
+    print("LASTM");
+    print(lastm);
   }
 
   Future<void> _getStoredUserData() async {
@@ -75,6 +92,7 @@ class _MyHomePageState extends State<MyHomePage> {
       alertC = prefs.getBool("alertC");
       msjC = prefs.getBool("msjC") ?? false;
       logI = prefs.getBool("logInOut");
+      title = prefs.getStringList("m");
     });
     _loadAlbumData();
 
@@ -225,6 +243,17 @@ class _MyHomePageState extends State<MyHomePage> {
     launch(url);
   }
 
+// Función para manejar la actualización de datos
+  Future<void> _refresh() async {
+    // Agrega aquí la lógica para actualizar tus datos
+    // Puedes llamar a funciones asíncronas o realizar peticiones a una API, por ejemplo
+    contarAlertas();
+    contarPosicion();
+    _getStoredUserData();
+    // Simulando una pausa de 2 segundos
+    await Future.delayed(const Duration(seconds: 1));
+  }
+
   @override
   Widget build(BuildContext context) {
     return Stack(children: [
@@ -265,14 +294,6 @@ class _MyHomePageState extends State<MyHomePage> {
                       Navigator.pushNamed(
                         context,
                         "/mensajes",
-                        arguments:
-                            lastMessage != null && lastMessage!.isNotEmpty
-                                ? lastMessage!
-                                : [
-                                    MensajesArguments(
-                                        title: ["No tienes mensajes"],
-                                        body: [""])
-                                  ],
                       );
                     },
                     backgroundColor: Color.fromARGB(255, 37, 211, 102),
@@ -285,13 +306,13 @@ class _MyHomePageState extends State<MyHomePage> {
                       padding: const EdgeInsets.all(5),
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: lastMessage != null && lastMessage!.isNotEmpty
+                        color: title != null && title!.isNotEmpty
                             ? Colors.red
                             : Colors.transparent,
                       ),
                       child: Text(
-                        lastMessage != null && lastMessage!.isNotEmpty
-                            ? "${lastMessage!.length}" // Muestra el número de mensajes no leídos
+                        title != null && title!.isNotEmpty
+                            ? "${title!.length}" // Muestra el número de mensajes no leídos
                             : "",
                         style: const TextStyle(
                           color: Colors.white,
@@ -308,292 +329,35 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Widget _buildScrollView() {
-    return SingleChildScrollView(
-      child: Container(
-        height: MediaQuery.of(context).size.height,
-        decoration: const BoxDecoration(
-          color: Color.fromRGBO(
-              94, 232, 250, 0.5), // Cambia el color aquí según tu preferencia
-        ),
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: <Widget>[
-              //PERFIL
-              InkWell(
-                onTap: () {
-                  Navigator.pushNamed(context, "/perfil");
-                },
-                child: const FractionallySizedBox(
-                  widthFactor: 0.9,
-                  child: Row(
-                    children: [
-                      Icon(
-                        Icons.account_circle_outlined,
-                        color: Colors.white,
-                        size: 30,
-                      ),
-                      Text(
-                        "Mi perfil",
-                        style: TextStyle(
-                          color: Color.fromARGB(255, 252, 250, 250),
-                          fontSize: 20,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              const FractionallySizedBox(
-                widthFactor: 0.9,
-                child: Divider(
-                  color: Colors.white,
-                  thickness: 1,
-                ),
-              ),
-
-              //ALERTAS
-              InkWell(
-                onTap: () {
-                  Navigator.pushNamed(context, "/alert");
-                },
-                child: FractionallySizedBox(
-                  widthFactor: 0.9,
-                  child: Row(
-                    children: [
-                      Stack(
-                        children: [
-                          const Icon(
-                            Icons.campaign,
-                            color: Colors.white,
-                            size: 30,
-                          ),
-                          Positioned(
-                            right: 0,
-                            child: Container(
-                              padding: const EdgeInsets.all(2),
-                              decoration: const BoxDecoration(
-                                shape: BoxShape.circle,
-                                color: Colors
-                                    .red, // Cambia el color según tus preferencias
-                              ),
-                              child: Builder(
-                                builder: (BuildContext context) {
-                                  final alertasLength = alertas?.length ?? 0;
-                                  return Text(
-                                    alertasLength.toString(),
-                                    style: const TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 12,
-                                    ),
-                                  );
-                                },
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(
-                          width: 8), // Ajusta el espacio según tus preferencias
-                      const Text(
-                        "Alertas",
-                        style: TextStyle(
-                          color: Color.fromARGB(255, 252, 250, 250),
-                          fontSize: 20,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              const FractionallySizedBox(
-                widthFactor: 0.9,
-                child: Divider(
-                  color: Colors.white,
-                  thickness: 1,
-                ),
-              ),
-
-              //EN POSICIÓN
-              InkWell(
-                onTap: () {
-                  Navigator.pushNamed(context, "/position");
-                },
-                child: FractionallySizedBox(
-                  widthFactor: 0.9,
-                  child: Row(
-                    children: [
-                      Stack(
-                        children: [
-                          const Icon(
-                            Icons.location_on,
-                            color: Colors.white,
-                            size: 30,
-                          ),
-                          Positioned(
-                            right: 0,
-                            child: Container(
-                              padding: const EdgeInsets.all(2),
-                              decoration: const BoxDecoration(
-                                shape: BoxShape.circle,
-                                color: Colors
-                                    .red, // Cambia el color según tus preferencias
-                              ),
-                              child: Builder(
-                                builder: (BuildContext context) {
-                                  final posicionLength = posicion?.length ?? 0;
-                                  return Text(
-                                    posicionLength.toString(),
-                                    style: const TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 12,
-                                    ),
-                                  );
-                                },
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(
-                          width: 8), // Ajusta el espacio según tus preferencias
-                      const Text(
-                        "En posicion",
-                        style: TextStyle(
-                          color: Color.fromARGB(255, 252, 250, 250),
-                          fontSize: 20,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              const FractionallySizedBox(
-                widthFactor: 0.9,
-                child: Divider(
-                  color: Colors.white,
-                  thickness: 1,
-                ),
-              ),
-              //HISTÓRICO
-              InkWell(
-                onTap: () {
-                  Navigator.pushNamed(context, "/historic");
-                },
-                child: const FractionallySizedBox(
-                  widthFactor: 0.9,
-                  child: Row(
-                    children: [
-                      Icon(
-                        Icons.description,
-                        color: Colors.white,
-                        size: 30,
-                      ),
-                      Text(
-                        "Histórico CP",
-                        style: TextStyle(
-                          color: Color.fromARGB(255, 252, 250, 250),
-                          fontSize: 20,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              const FractionallySizedBox(
-                widthFactor: 0.9,
-                child: Divider(
-                  color: Colors.white,
-                  thickness: 1,
-                ),
-              ),
-              //HERRAMIENTAS
-              InkWell(
-                onTap: () {
-                  Navigator.pushNamed(context, "/tool");
-                },
-                child: const FractionallySizedBox(
-                  widthFactor: 0.9,
-                  child: Row(
-                    children: [
-                      Icon(
-                        Icons.build,
-                        color: Colors.white,
-                        size: 30,
-                      ),
-                      Text(
-                        "Herramientas",
-                        style: TextStyle(
-                          color: Color.fromARGB(255, 252, 250, 250),
-                          fontSize: 20,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              const FractionallySizedBox(
-                widthFactor: 0.9,
-                child: Divider(
-                  color: Colors.white,
-                  thickness: 1,
-                ),
-              ),
-              //WHATSAPP
-              InkWell(
-                onTap: _launchWhatsApp,
-                child: const FractionallySizedBox(
-                  widthFactor: 0.9,
-                  child: Row(
-                    children: [
-                      Icon(
-                        Icons.call,
-                        color: Colors.white,
-                        size: 30,
-                      ),
-                      Text(
-                        "WhatsApp",
-                        style: TextStyle(
-                          color: Color.fromARGB(255, 252, 250, 250),
-                          fontSize: 20,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              const FractionallySizedBox(
-                widthFactor: 0.9,
-                child: Divider(
-                  color: Colors.white,
-                  thickness: 1,
-                ),
-              ),
-              //CERRAR SESIÓN
-              InkWell(
-                onTap: () async {
-                  // Cambiar el valor de logI a false y guardarlo en SharedPreferences
-                  final prefs = await SharedPreferences.getInstance();
-                  await prefs.setBool('logInOut', false);
-
-                  // Actualizar el estado en la aplicación
-                  setState(() {
-                    logI = false;
-                  });
-                  Navigator.pushNamed(context, "/inicio");
-                },
-                child: Container(
+    return RefreshIndicator(
+      onRefresh: _refresh,
+      child: SingleChildScrollView(
+        child: Container(
+          height: MediaQuery.of(context).size.height,
+          decoration: const BoxDecoration(
+            color: Color.fromRGBO(
+                94, 232, 250, 0.5), // Cambia el color aquí según tu preferencia
+          ),
+          child: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: <Widget>[
+                //PERFIL
+                InkWell(
+                  onTap: () {
+                    Navigator.pushNamed(context, "/perfil");
+                  },
                   child: const FractionallySizedBox(
                     widthFactor: 0.9,
                     child: Row(
                       children: [
                         Icon(
-                          Icons.close,
+                          Icons.account_circle_outlined,
                           color: Colors.white,
                           size: 30,
                         ),
                         Text(
-                          "Cerrar sesión",
+                          "Mi perfil",
                           style: TextStyle(
                             color: Color.fromARGB(255, 252, 250, 250),
                             fontSize: 20,
@@ -603,8 +367,271 @@ class _MyHomePageState extends State<MyHomePage> {
                     ),
                   ),
                 ),
-              ),
-            ],
+                const FractionallySizedBox(
+                  widthFactor: 0.9,
+                  child: Divider(
+                    color: Colors.white,
+                    thickness: 1,
+                  ),
+                ),
+
+                //ALERTAS
+                InkWell(
+                  onTap: () {
+                    Navigator.pushNamed(context, "/alert");
+                  },
+                  child: FractionallySizedBox(
+                    widthFactor: 0.9,
+                    child: Row(
+                      children: [
+                        Stack(
+                          children: [
+                            const Icon(
+                              Icons.campaign,
+                              color: Colors.white,
+                              size: 30,
+                            ),
+                            Positioned(
+                              right: 0,
+                              child: Container(
+                                padding: const EdgeInsets.all(2),
+                                decoration: const BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: Colors
+                                      .red, // Cambia el color según tus preferencias
+                                ),
+                                child: Builder(
+                                  builder: (BuildContext context) {
+                                    final alertasLength = alertas?.length ?? 0;
+                                    return Text(
+                                      alertasLength.toString(),
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 12,
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(
+                            width:
+                                8), // Ajusta el espacio según tus preferencias
+                        const Text(
+                          "Alertas",
+                          style: TextStyle(
+                            color: Color.fromARGB(255, 252, 250, 250),
+                            fontSize: 20,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                const FractionallySizedBox(
+                  widthFactor: 0.9,
+                  child: Divider(
+                    color: Colors.white,
+                    thickness: 1,
+                  ),
+                ),
+
+                //EN POSICIÓN
+                InkWell(
+                  onTap: () {
+                    Navigator.pushNamed(context, "/position");
+                  },
+                  child: FractionallySizedBox(
+                    widthFactor: 0.9,
+                    child: Row(
+                      children: [
+                        Stack(
+                          children: [
+                            const Icon(
+                              Icons.location_on,
+                              color: Colors.white,
+                              size: 30,
+                            ),
+                            Positioned(
+                              right: 0,
+                              child: Container(
+                                padding: const EdgeInsets.all(2),
+                                decoration: const BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: Colors
+                                      .red, // Cambia el color según tus preferencias
+                                ),
+                                child: Builder(
+                                  builder: (BuildContext context) {
+                                    final posicionLength =
+                                        posicion?.length ?? 0;
+                                    return Text(
+                                      posicionLength.toString(),
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 12,
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(
+                            width:
+                                8), // Ajusta el espacio según tus preferencias
+                        const Text(
+                          "En posicion",
+                          style: TextStyle(
+                            color: Color.fromARGB(255, 252, 250, 250),
+                            fontSize: 20,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                const FractionallySizedBox(
+                  widthFactor: 0.9,
+                  child: Divider(
+                    color: Colors.white,
+                    thickness: 1,
+                  ),
+                ),
+                //HISTÓRICO
+                InkWell(
+                  onTap: () {
+                    Navigator.pushNamed(context, "/historic");
+                  },
+                  child: const FractionallySizedBox(
+                    widthFactor: 0.9,
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.description,
+                          color: Colors.white,
+                          size: 30,
+                        ),
+                        Text(
+                          "Histórico CP",
+                          style: TextStyle(
+                            color: Color.fromARGB(255, 252, 250, 250),
+                            fontSize: 20,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                const FractionallySizedBox(
+                  widthFactor: 0.9,
+                  child: Divider(
+                    color: Colors.white,
+                    thickness: 1,
+                  ),
+                ),
+                //HERRAMIENTAS
+                InkWell(
+                  onTap: () {
+                    Navigator.pushNamed(context, "/tool");
+                  },
+                  child: const FractionallySizedBox(
+                    widthFactor: 0.9,
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.build,
+                          color: Colors.white,
+                          size: 30,
+                        ),
+                        Text(
+                          "Herramientas",
+                          style: TextStyle(
+                            color: Color.fromARGB(255, 252, 250, 250),
+                            fontSize: 20,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                const FractionallySizedBox(
+                  widthFactor: 0.9,
+                  child: Divider(
+                    color: Colors.white,
+                    thickness: 1,
+                  ),
+                ),
+                //WHATSAPP
+                InkWell(
+                  onTap: _launchWhatsApp,
+                  child: const FractionallySizedBox(
+                    widthFactor: 0.9,
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.call,
+                          color: Colors.white,
+                          size: 30,
+                        ),
+                        Text(
+                          "WhatsApp",
+                          style: TextStyle(
+                            color: Color.fromARGB(255, 252, 250, 250),
+                            fontSize: 20,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                const FractionallySizedBox(
+                  widthFactor: 0.9,
+                  child: Divider(
+                    color: Colors.white,
+                    thickness: 1,
+                  ),
+                ),
+                //CERRAR SESIÓN
+                InkWell(
+                  onTap: () async {
+                    // Cambiar el valor de logI a false y guardarlo en SharedPreferences
+                    final prefs = await SharedPreferences.getInstance();
+                    await prefs.setBool('logInOut', false);
+
+                    // Actualizar el estado en la aplicación
+                    setState(() {
+                      logI = false;
+                    });
+                    Navigator.pushNamed(context, "/inicio");
+                  },
+                  child: Container(
+                    child: const FractionallySizedBox(
+                      widthFactor: 0.9,
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.close,
+                            color: Colors.white,
+                            size: 30,
+                          ),
+                          Text(
+                            "Cerrar sesión",
+                            style: TextStyle(
+                              color: Color.fromARGB(255, 252, 250, 250),
+                              fontSize: 20,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),

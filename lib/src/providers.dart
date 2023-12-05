@@ -27,11 +27,10 @@ class PushNotProv {
 
       // Guardar en SharedPreferences
       final prefs = await SharedPreferences.getInstance();
-
       await prefs.setString('tok', tok);
     });
 
-    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
       print('Got a message whilst in the foreground!');
       if (message.notification != null) {
         // Almacena el último mensaje
@@ -45,14 +44,24 @@ class PushNotProv {
 
         // Añade el mensaje al stream
         _mensajeStreamControll.add(mensajesList);
-        print("mensajesList prov");
-        print(mensajesList);
+
+        // Acumula los nuevos títulos y cuerpos
+        List<String> accumulatedTitles = [];
+        List<String> accumulatedBodies = [];
+        for (var e in mensajesList) {
+          accumulatedTitles.addAll(e.title);
+          accumulatedBodies.addAll(e.body);
+        }
+
+        // Actualiza SharedPreferences con los nuevos títulos y cuerpos acumulados
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setStringList('m', accumulatedTitles);
+        await prefs.setStringList('mb', accumulatedBodies);
       }
     });
 
     // Manejar notificaciones cuando la aplicación está en segundo plano y el usuario toca la notificación
-    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-      print('Got a message whilst in the foreground!');
+    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) async {
       if (message.notification != null) {
         // Almacena el último mensaje
 
@@ -65,6 +74,17 @@ class PushNotProv {
 
         // Añade el mensaje al stream
         _mensajeStreamControll.add(mensajesList);
+        List<String> accumulatedTitles = [];
+        List<String> accumulatedBodies = [];
+        for (var e in mensajesList) {
+          accumulatedTitles.addAll(e.title);
+          accumulatedBodies.addAll(e.body);
+        }
+
+        // Actualiza SharedPreferences con los nuevos títulos y cuerpos acumulados
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setStringList('m', accumulatedTitles);
+        await prefs.setStringList('mb', accumulatedBodies);
       }
     });
 
@@ -74,7 +94,6 @@ class PushNotProv {
 
   Future<void> _firebaseMessagingBackgroundHandler(
       RemoteMessage message) async {
-    print('Got a message whilst in the foreground!');
     if (message.notification != null) {
       // Almacena el último mensaje
 

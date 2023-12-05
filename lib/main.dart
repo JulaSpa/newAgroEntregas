@@ -12,7 +12,6 @@ import 'package:flutter_application_1/pages/inicio_page.dart';
 import 'package:flutter_application_1/pages/camionesCP_page.dart';
 import 'package:flutter_application_1/pages/camionesbusq_page.dart';
 import 'package:flutter_application_1/pages/mensajes_page.dart';
-import 'package:flutter_application_1/src/providers.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() async {
@@ -34,25 +33,6 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Flutter Demo',
       initialRoute: logI == false || logI == null ? '/inicio' : '/home',
-      onGenerateRoute: (settings) {
-        if (settings.name == '/mensajes') {
-          // Si la ruta es "/mensajes", extrae los argumentos y crea la página
-          final args = settings.arguments;
-          if (args is List<MensajesArguments>) {
-            return MaterialPageRoute(
-              builder: (context) {
-                return Mensajes(
-                  arguments: args,
-                );
-              },
-            );
-          }
-        }
-        // Otras rutas...
-
-        // Si ninguna condición anterior se cumple, devuelve una ruta nula o la ruta que corresponda
-        return null; // O devuelve otra ruta en función de tus necesidades
-      },
       routes: {
         "/inicio": (context) => const Inicio(),
         "/camionesCP": (context) => const Camiones(),
@@ -65,6 +45,7 @@ class MyApp extends StatelessWidget {
         "/historic": (context) => const Historic(),
         "/tool": (context) => const Tool(),
         "/buscar": (context) => const Buscar(),
+        "/mensajes": (context) => const Mensajes(),
       },
     );
   }

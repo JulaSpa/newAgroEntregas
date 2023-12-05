@@ -5,6 +5,12 @@ import 'dart:convert';
 import "package:flutter_application_1/album/album.dart";
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter_application_1/pages/detalles_page.dart';
+import 'package:photo_view/photo_view.dart';
+import 'package:photo_view/photo_view_gallery.dart';
+import 'package:share_plus/share_plus.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:flutter/services.dart';
+import 'dart:io';
 
 class Alert extends StatefulWidget {
   const Alert({super.key});
@@ -107,6 +113,7 @@ class _AlertState extends State<Alert> {
             centerTitle: true,
             toolbarHeight: 60,
             iconTheme: const IconThemeData(color: Colors.white),
+            automaticallyImplyLeading: true,
           ),
           body: DecoratedBox(
             decoration: const BoxDecoration(
@@ -408,6 +415,85 @@ class _AlertState extends State<Alert> {
                                     ),
                                   ],
                                 ),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        const Padding(
+                                          padding:
+                                              EdgeInsetsDirectional.fromSTEB(
+                                                  40, 0, 0, 0),
+                                          child: Text(
+                                            "PATENTE CAMIÓN: ",
+                                            style: TextStyle(
+                                              fontSize: 15,
+                                              color: Colors.black,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                        ),
+                                        Expanded(
+                                          child: Text(
+                                            album.chasisFl.toUpperCase(),
+                                            style: const TextStyle(
+                                              fontSize: 15,
+                                              color: Colors.lightBlue,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                                InkWell(
+                                  onTap: () async {
+                                    final String nroCP = album.nroCP;
+                                    final prefs =
+                                        await SharedPreferences.getInstance();
+                                    await prefs.setString('nroCP', nroCP);
+                                    _downLoad(
+                                        username, password, nroCP, context);
+                                  },
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Row(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          const Padding(
+                                            padding:
+                                                EdgeInsetsDirectional.fromSTEB(
+                                                    40, 0, 0, 0),
+                                            child: Text(
+                                              "IMAGEN: ",
+                                              style: TextStyle(
+                                                fontSize: 15,
+                                                color: Colors.black,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                          ),
+                                          Expanded(
+                                            child: Text(
+                                              album.imagen,
+                                              style: const TextStyle(
+                                                fontSize: 15,
+                                                color: Colors.lightBlue,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                ),
                                 Padding(
                                   padding: const EdgeInsetsDirectional.fromSTEB(
                                       0, 10, 0, 10),
@@ -438,6 +524,124 @@ class _AlertState extends State<Alert> {
         ),
       ],
     );
+  }
+}
+
+void _downLoad(
+  String? username,
+  String? password,
+  String? nroCP,
+  BuildContext context,
+) async {
+  /* print(nroCP);
+  print(username);
+  print(password); */
+  final requestData = {
+    'usuario': username,
+    'contraseña': password,
+    'nrocp': nroCP
+  };
+  /* print(requestData); */
+
+  final response = await http.post(
+    Uri.parse('http://net.entreganet.com/RestServiceImpl.svc/Imagen'),
+    headers: <String, String>{
+      'Content-Type': 'application/json; charset=UTF-8',
+    },
+    body: jsonEncode(requestData),
+  );
+
+  try {
+    if (response.statusCode == 200) {
+      final jsonResponse = jsonDecode(response.body);
+      final base64Image = jsonResponse['ImagenResult'];
+      _showImageDialog(context, base64Image);
+    } else {
+      print('Error al descargar la imagen');
+    }
+  } catch (e) {
+    print('Error al descargar la imagen: $e');
+    // Mostrar un diálogo de error
+  }
+}
+
+void _showImageDialog(BuildContext context, String base64Image) {
+  showDialog(
+    context: context,
+    builder: (context) {
+      return Dialog(
+        backgroundColor: Colors.transparent,
+        child: Stack(
+          children: [
+            PhotoViewGallery.builder(
+              itemCount: 1,
+              builder: (context, index) {
+                return PhotoViewGalleryPageOptions(
+                  imageProvider: MemoryImage(base64.decode(base64Image)),
+                  minScale: PhotoViewComputedScale.contained,
+                  maxScale: PhotoViewComputedScale.covered * 2,
+                  heroAttributes: PhotoViewHeroAttributes(tag: index),
+                );
+              },
+              scrollPhysics: const BouncingScrollPhysics(),
+              backgroundDecoration: const BoxDecoration(
+                color: Colors.transparent,
+              ),
+              pageController: PageController(),
+            ),
+            Align(
+              alignment: Alignment.topRight,
+              child: TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: const Icon(
+                  Icons.close, // Icono de cierre
+                  color: Colors.white, // Color del icono
+                  size: 24.0, // Tamaño del icono
+                ),
+              ),
+            ),
+            Align(
+              alignment: Alignment.topRight,
+              child: Container(
+                margin: const EdgeInsets.only(right: 50.0),
+                child: TextButton(
+                  onPressed: () {
+                    _shareImage(base64Image);
+                  },
+                  child: const Icon(
+                    Icons.share, // Icono de cierre
+                    color: Colors.white, // Color del icono
+                    size: 24.0, // Tamaño del icono
+                  ),
+                ),
+              ),
+            )
+          ],
+        ),
+      );
+    },
+  );
+}
+
+Future<void> _shareImage(String base64Image) async {
+  try {
+    // Decodificar la cadena base64 en bytes
+    Uint8List bytes = base64.decode(base64Image);
+
+    // Obtener un directorio temporal para guardar el archivo
+    Directory tempDir = await getTemporaryDirectory();
+    String tempFilePath = '${tempDir.path}/temp_image.png';
+
+    // Guardar los bytes en un archivo temporal
+    File tempFile = File(tempFilePath);
+    await tempFile.writeAsBytes(bytes);
+
+    // Compartir el archivo
+    await Share.shareFiles([tempFilePath]);
+  } catch (e) {
+    print('Error al compartir la imagen: $e');
   }
 }
 

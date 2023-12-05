@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/src/providers.dart';
+
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:firebase_core/firebase_core.dart';
 
 class Mensajes extends StatefulWidget {
-  final List<MensajesArguments> arguments;
-  const Mensajes({super.key, required this.arguments});
+  const Mensajes({super.key});
 
   @override
   State<Mensajes> createState() => _Mensajes();
@@ -13,45 +11,26 @@ class Mensajes extends StatefulWidget {
 
 class _Mensajes extends State<Mensajes> {
   bool? msjC;
-  late PushNotProv pushNotProv;
-  late ValueNotifier<int> messageCountNotifier;
-  List<MensajesArguments>? lastMessage;
-  bool firebaseInitialized = false;
+  List? title;
+  List? text;
   @override
   void initState() {
     super.initState();
     // Imprimir los argumentos al inicializar la página
     /* print("Arguments in Mensajes: ${widget.arguments}"); */
     getStoredUserData();
-    //FUNCION QUE ACTUALIZA /MENSAJES CUANDO LLEGA UNO.
-    WidgetsFlutterBinding.ensureInitialized();
-    Firebase.initializeApp().then((_) {
-      // La inicialización de Firebase se ha completado
-      pushNotProv = PushNotProv();
-      // ENVIA TOKEN A FIREBASE
-      pushNotProv.initNotifications(); // Utiliza la instancia existente
-      setState(() {
-        if (mounted) {
-          firebaseInitialized = true; // Marca que Firebase se ha inicializado
-        }
-      });
-      pushNotProv.mensajes.listen((List<MensajesArguments> messages) {
-        if (mounted) {
-          setState(() {
-            lastMessage = messages;
-          });
-        }
-      });
-    }).catchError((error) {
-      print("Error al inicializar Firebase: $error");
-    });
   }
 
   Future<void> getStoredUserData() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
       msjC = prefs.getBool("msjC") ?? false;
+      title = prefs.getStringList("m");
+      text = prefs.getStringList("mb");
     });
+    print("/mensajes title y text");
+    print(title);
+    print(text);
   }
 
   @override
@@ -76,15 +55,59 @@ class _Mensajes extends State<Mensajes> {
               ),
             ),
           ),
-          Container(
-            child: Column(
-              children: <Widget>[
-                for (var message in widget.arguments)
-                  MensajeWidget(
-                    title: message.title,
-                    body: message.body,
-                  ),
-              ],
+
+          // Agregar un ListView para mostrar las listas de title y text
+          Positioned(
+            top: 40,
+            left: 20,
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  if (title != null && text != null)
+                    for (int i = 0; i < title!.length; i++)
+                      Card(
+                        margin: const EdgeInsets.only(bottom: 20),
+                        child: Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  const Icon(
+                                    Icons.message,
+                                    color: Colors.blue,
+                                  ),
+                                  const SizedBox(width: 8.0),
+                                  Text(
+                                    title![i],
+                                    style: const TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 8.0),
+                              Text(
+                                text![i],
+                                style: const TextStyle(fontSize: 14),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                  if (title == null ||
+                      text == null ||
+                      title!.isEmpty ||
+                      text!.isEmpty)
+                    const Text(
+                      'No tienes mensajes.',
+                      style: TextStyle(fontSize: 16, color: Colors.white),
+                    ),
+                ],
+              ),
             ),
           ),
         ],
@@ -107,12 +130,23 @@ class _Mensajes extends State<Mensajes> {
                     },
                     child: const Text("Cancelar"),
                   ),
-                  // Botón para confirmar y navegar a /home
+                  // Botón para confirmar y eliminar mensajes
                   TextButton(
-                    onPressed: () {
+                    onPressed: () async {
                       // Acción que se realiza al confirmar
                       Navigator.of(context)
                           .pop(); // Cerrar el cuadro de diálogo
+
+                      // Eliminar títulos y textos de SharedPreferences
+                      final prefs = await SharedPreferences.getInstance();
+                      await prefs.remove("m");
+                      await prefs.remove("mb");
+
+                      // Actualizar la interfaz de usuario para reflejar el cambio
+                      setState(() {
+                        title = null;
+                        text = null;
+                      });
                       Navigator.pushNamed(context, "/home");
                     },
                     child: const Text("Confirmar"),
@@ -124,68 +158,6 @@ class _Mensajes extends State<Mensajes> {
         },
         child: const Icon(Icons.delete),
         backgroundColor: Colors.red,
-      ),
-    );
-  }
-}
-
-class MensajeWidget extends StatelessWidget {
-  final List<String> title;
-  final List<String> body;
-
-  const MensajeWidget({
-    Key? key,
-    required this.title,
-    required this.body,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsetsDirectional.fromSTEB(40, 10, 0, 0),
-      child: Align(
-        alignment: Alignment.centerLeft,
-        child: IntrinsicWidth(
-          child: Card(
-            margin: const EdgeInsets.all(15),
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  for (var i = 0; i < title.length; i++)
-                    Column(
-                      children: [
-                        Row(
-                          children: [
-                            const Icon(
-                              Icons.message, // Ícono de burbuja de diálogo
-                              color: Colors.blue, // Color del ícono
-                            ),
-                            const SizedBox(width: 8.0),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    title[i],
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                  Text(body[i]),
-                                ],
-                              ),
-                            ),
-                          ],
-                        )
-                      ],
-                    ),
-                ],
-              ),
-            ),
-          ),
-        ),
       ),
     );
   }

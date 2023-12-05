@@ -113,6 +113,7 @@ class _PositionState extends State<Position> {
             centerTitle: true,
             toolbarHeight: 60,
             iconTheme: const IconThemeData(color: Colors.white),
+            automaticallyImplyLeading: true,
           ),
           body: DecoratedBox(
             decoration: const BoxDecoration(
@@ -384,6 +385,40 @@ class _PositionState extends State<Position> {
                                           child: Text(
                                             album.observacionesana
                                                 .toUpperCase(),
+                                            style: const TextStyle(
+                                              fontSize: 15,
+                                              color: Colors.lightBlue,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        const Padding(
+                                          padding:
+                                              EdgeInsetsDirectional.fromSTEB(
+                                                  40, 0, 0, 0),
+                                          child: Text(
+                                            "PATENTE CAMIÓN: ",
+                                            style: TextStyle(
+                                              fontSize: 15,
+                                              color: Colors.black,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                        ),
+                                        Expanded(
+                                          child: Text(
+                                            album.chasisFl.toUpperCase(),
                                             style: const TextStyle(
                                               fontSize: 15,
                                               color: Colors.lightBlue,

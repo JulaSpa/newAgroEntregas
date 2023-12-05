@@ -469,6 +469,14 @@ class AlertDetails extends StatelessWidget {
                       ),
                     ],
                   ),
+                  const Padding(
+                    padding: EdgeInsetsDirectional.fromSTEB(
+                        40, 0, 40, 5), // Añade relleno solo al lado derecho
+                    child: Divider(
+                      color: Colors.black,
+                      thickness: 0.5,
+                    ),
+                  ),
                 ],
               ),
             ),
