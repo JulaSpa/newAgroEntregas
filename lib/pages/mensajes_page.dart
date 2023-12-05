@@ -35,39 +35,37 @@ class _Mensajes extends State<Mensajes> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Image.asset("lib/images/logoAgroEntregas.png"),
-        backgroundColor: Colors.blue,
-        elevation: 0,
-        centerTitle: true,
-        toolbarHeight: 60,
-        iconTheme: const IconThemeData(color: Colors.white),
-        automaticallyImplyLeading: true,
-      ),
-      body: Stack(
-        children: <Widget>[
-          Container(
-            decoration: const BoxDecoration(
-              image: DecorationImage(
-                image: AssetImage("lib/images/camiones.jpg"),
-                fit: BoxFit.cover,
-              ),
+    return Stack(
+      children: [
+        Container(
+          decoration: const BoxDecoration(
+            image: DecorationImage(
+              image: AssetImage("lib/images/camiones.jpg"),
+              fit: BoxFit.cover,
             ),
           ),
-
-          // Agregar un ListView para mostrar las listas de title y text
-          Positioned(
-            top: 40,
-            left: 20,
-            child: SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  if (title != null && text != null)
-                    for (int i = 0; i < title!.length; i++)
-                      Card(
-                        margin: const EdgeInsets.only(bottom: 20),
+        ),
+        Scaffold(
+          backgroundColor: Colors.transparent,
+          appBar: AppBar(
+            title: Image.asset("lib/images/logoAgroEntregas.png"),
+            backgroundColor: Colors.blue,
+            elevation: 0,
+            centerTitle: true,
+            toolbarHeight: 60,
+            iconTheme: const IconThemeData(color: Colors.white),
+            automaticallyImplyLeading: true,
+          ),
+          body: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (title != null && text != null)
+                  for (int i = 0; i < title!.length; i++)
+                    IntrinsicWidth(
+                      child: Card(
+                        margin: const EdgeInsets.only(
+                            bottom: 10, top: 10, left: 20),
                         child: Padding(
                           padding: const EdgeInsets.all(16.0),
                           child: Column(
@@ -98,67 +96,70 @@ class _Mensajes extends State<Mensajes> {
                           ),
                         ),
                       ),
-                  if (title == null ||
-                      text == null ||
-                      title!.isEmpty ||
-                      text!.isEmpty)
-                    const Text(
+                    ),
+                if (title == null ||
+                    text == null ||
+                    title!.isEmpty ||
+                    text!.isEmpty)
+                  const Padding(
+                    padding: EdgeInsets.only(bottom: 10, top: 10, left: 20),
+                    child: Text(
                       'No tienes mensajes.',
                       style: TextStyle(fontSize: 16, color: Colors.white),
                     ),
-                ],
-              ),
+                  ),
+              ],
             ),
           ),
-        ],
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          // Mostrar el cuadro de diálogo de confirmación
-          showDialog(
-            context: context,
-            builder: (BuildContext context) {
-              return AlertDialog(
-                title: const Text("Confirmación"),
-                content: const Text(
-                    "¿Estás seguro de que deseas eliminar los mensajes?"),
-                actions: [
-                  // Botón para cancelar
-                  TextButton(
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                    child: const Text("Cancelar"),
-                  ),
-                  // Botón para confirmar y eliminar mensajes
-                  TextButton(
-                    onPressed: () async {
-                      // Acción que se realiza al confirmar
-                      Navigator.of(context)
-                          .pop(); // Cerrar el cuadro de diálogo
+          floatingActionButton: FloatingActionButton(
+            onPressed: () {
+              // Mostrar el cuadro de diálogo de confirmación
+              showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  return AlertDialog(
+                    title: const Text("Confirmación"),
+                    content: const Text(
+                        "¿Estás seguro de que deseas eliminar los mensajes?"),
+                    actions: [
+                      // Botón para cancelar
+                      TextButton(
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                        child: const Text("Cancelar"),
+                      ),
+                      // Botón para confirmar y eliminar mensajes
+                      TextButton(
+                        onPressed: () async {
+                          // Acción que se realiza al confirmar
+                          Navigator.of(context)
+                              .pop(); // Cerrar el cuadro de diálogo
 
-                      // Eliminar títulos y textos de SharedPreferences
-                      final prefs = await SharedPreferences.getInstance();
-                      await prefs.remove("m");
-                      await prefs.remove("mb");
+                          // Eliminar títulos y textos de SharedPreferences
+                          final prefs = await SharedPreferences.getInstance();
+                          await prefs.remove("m");
+                          await prefs.remove("mb");
 
-                      // Actualizar la interfaz de usuario para reflejar el cambio
-                      setState(() {
-                        title = null;
-                        text = null;
-                      });
-                      Navigator.pushNamed(context, "/home");
-                    },
-                    child: const Text("Confirmar"),
-                  ),
-                ],
+                          // Actualizar la interfaz de usuario para reflejar el cambio
+                          setState(() {
+                            title = null;
+                            text = null;
+                          });
+                          Navigator.pushNamed(context, "/home");
+                        },
+                        child: const Text("Confirmar"),
+                      ),
+                    ],
+                  );
+                },
               );
             },
-          );
-        },
-        child: const Icon(Icons.delete),
-        backgroundColor: Colors.red,
-      ),
+            child: const Icon(Icons.delete),
+            backgroundColor: Colors.red,
+          ),
+        )
+      ],
     );
   }
 }
