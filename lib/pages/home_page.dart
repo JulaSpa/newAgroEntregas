@@ -306,13 +306,13 @@ class _MyHomePageState extends State<MyHomePage> {
                       padding: const EdgeInsets.all(5),
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: title != null && title!.isNotEmpty
+                        color: lastMessage != null && lastMessage!.isNotEmpty
                             ? Colors.red
                             : Colors.transparent,
                       ),
                       child: Text(
-                        title != null && title!.isNotEmpty
-                            ? "${title!.length}" // Muestra el número de mensajes no leídos
+                        lastMessage != null && lastMessage!.isNotEmpty
+                            ? "${lastMessage!.length}" // Muestra el número de mensajes no leídos
                             : "",
                         style: const TextStyle(
                           color: Colors.white,
