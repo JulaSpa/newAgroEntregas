@@ -550,11 +550,36 @@ void _showImageDialog(BuildContext context, String base64Image) {
   showDialog(
     context: context,
     builder: (context) {
-      return Dialog(
-        backgroundColor: Colors.transparent,
-        child: Stack(
-          children: [
-            PhotoViewGallery.builder(
+      return Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: const Icon(
+                  Icons.close,
+                  color: Colors.white,
+                  size: 24.0,
+                ),
+              ),
+              TextButton(
+                onPressed: () {
+                  _shareImage(base64Image);
+                },
+                child: const Icon(
+                  Icons.share,
+                  color: Colors.white,
+                  size: 24.0,
+                ),
+              ),
+            ],
+          ),
+          Expanded(
+            child: PhotoViewGallery.builder(
+              scrollPhysics: const BouncingScrollPhysics(),
               itemCount: 1,
               builder: (context, index) {
                 return PhotoViewGalleryPageOptions(
@@ -564,43 +589,13 @@ void _showImageDialog(BuildContext context, String base64Image) {
                   heroAttributes: PhotoViewHeroAttributes(tag: index),
                 );
               },
-              scrollPhysics: const BouncingScrollPhysics(),
               backgroundDecoration: const BoxDecoration(
                 color: Colors.transparent,
               ),
               pageController: PageController(),
             ),
-            Align(
-              alignment: Alignment.topRight,
-              child: TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                child: const Icon(
-                  Icons.close, // Icono de cierre
-                  color: Colors.white, // Color del icono
-                  size: 24.0, // Tamaño del icono
-                ),
-              ),
-            ),
-            Align(
-              alignment: Alignment.topRight,
-              child: Container(
-                margin: const EdgeInsets.only(right: 50.0),
-                child: TextButton(
-                  onPressed: () {
-                    _shareImage(base64Image);
-                  },
-                  child: const Icon(
-                    Icons.share, // Icono de cierre
-                    color: Colors.white, // Color del icono
-                    size: 24.0, // Tamaño del icono
-                  ),
-                ),
-              ),
-            )
-          ],
-        ),
+          ),
+        ],
       );
     },
   );

@@ -9,6 +9,7 @@ import 'package:flutter/services.dart';
 import 'dart:io';
 import 'package:photo_view/photo_view.dart';
 import 'package:photo_view/photo_view_gallery.dart';
+import 'package:flutter_application_1/pages/detalles_page.dart';
 
 class Buscar extends StatefulWidget {
   const Buscar({super.key});
@@ -197,7 +198,7 @@ class _BuscarState extends State<Buscar> {
                                         const Padding(
                                           padding:
                                               EdgeInsetsDirectional.fromSTEB(
-                                                  5, 0, 0, 0),
+                                                  40, 0, 0, 0),
                                           child: Text(
                                             "TITULAR: ",
                                             style: TextStyle(
@@ -231,7 +232,7 @@ class _BuscarState extends State<Buscar> {
                                         const Padding(
                                           padding:
                                               EdgeInsetsDirectional.fromSTEB(
-                                                  5, 0, 0, 0),
+                                                  40, 0, 0, 0),
                                           child: Text(
                                             "PROCEDENCIA: ",
                                             style: TextStyle(
@@ -265,7 +266,7 @@ class _BuscarState extends State<Buscar> {
                                         const Padding(
                                           padding:
                                               EdgeInsetsDirectional.fromSTEB(
-                                                  5, 0, 0, 0),
+                                                  40, 0, 0, 0),
                                           child: Text(
                                             "NÚMERO CP: ",
                                             style: TextStyle(
@@ -299,7 +300,7 @@ class _BuscarState extends State<Buscar> {
                                         const Padding(
                                           padding:
                                               EdgeInsetsDirectional.fromSTEB(
-                                                  5, 0, 0, 0),
+                                                  40, 0, 0, 0),
                                           child: Text(
                                             "CORREDOR: ",
                                             style: TextStyle(
@@ -333,7 +334,7 @@ class _BuscarState extends State<Buscar> {
                                         const Padding(
                                           padding:
                                               EdgeInsetsDirectional.fromSTEB(
-                                                  5, 0, 0, 0),
+                                                  40, 0, 0, 0),
                                           child: Text(
                                             "OBSERVACION: ",
                                             style: TextStyle(
@@ -403,6 +404,21 @@ class _BuscarState extends State<Buscar> {
                                     ],
                                   ),
                                 ),
+                                Padding(
+                                  padding: const EdgeInsetsDirectional.fromSTEB(
+                                      0, 10, 0, 10),
+                                  child: ElevatedButton(
+                                    onPressed: () {
+                                      Navigator.of(context).push(
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              AlertDetails(album: album),
+                                        ),
+                                      );
+                                    },
+                                    child: const Text("Más información"),
+                                  ),
+                                ),
                               ],
                             );
                           },
@@ -463,11 +479,36 @@ void _showImageDialog(BuildContext context, String base64Image) {
   showDialog(
     context: context,
     builder: (context) {
-      return Dialog(
-        backgroundColor: Colors.transparent,
-        child: Stack(
-          children: [
-            PhotoViewGallery.builder(
+      return Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: const Icon(
+                  Icons.close,
+                  color: Colors.white,
+                  size: 24.0,
+                ),
+              ),
+              TextButton(
+                onPressed: () {
+                  _shareImage(base64Image);
+                },
+                child: const Icon(
+                  Icons.share,
+                  color: Colors.white,
+                  size: 24.0,
+                ),
+              ),
+            ],
+          ),
+          Expanded(
+            child: PhotoViewGallery.builder(
+              scrollPhysics: const BouncingScrollPhysics(),
               itemCount: 1,
               builder: (context, index) {
                 return PhotoViewGalleryPageOptions(
@@ -477,43 +518,13 @@ void _showImageDialog(BuildContext context, String base64Image) {
                   heroAttributes: PhotoViewHeroAttributes(tag: index),
                 );
               },
-              scrollPhysics: const BouncingScrollPhysics(),
               backgroundDecoration: const BoxDecoration(
                 color: Colors.transparent,
               ),
               pageController: PageController(),
             ),
-            Align(
-              alignment: Alignment.topRight,
-              child: TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                child: const Icon(
-                  Icons.close, // Icono de cierre
-                  color: Colors.white, // Color del icono
-                  size: 24.0, // Tamaño del icono
-                ),
-              ),
-            ),
-            Align(
-              alignment: Alignment.topRight,
-              child: Container(
-                margin: const EdgeInsets.only(right: 50.0),
-                child: TextButton(
-                  onPressed: () {
-                    _shareImage(base64Image);
-                  },
-                  child: const Icon(
-                    Icons.share, // Icono de cierre
-                    color: Colors.white, // Color del icono
-                    size: 24.0, // Tamaño del icono
-                  ),
-                ),
-              ),
-            )
-          ],
-        ),
+          ),
+        ],
       );
     },
   );

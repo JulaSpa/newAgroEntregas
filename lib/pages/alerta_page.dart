@@ -569,11 +569,36 @@ void _showImageDialog(BuildContext context, String base64Image) {
   showDialog(
     context: context,
     builder: (context) {
-      return Dialog(
-        backgroundColor: Colors.transparent,
-        child: Stack(
-          children: [
-            PhotoViewGallery.builder(
+      return Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: const Icon(
+                  Icons.close,
+                  color: Colors.white,
+                  size: 24.0,
+                ),
+              ),
+              TextButton(
+                onPressed: () {
+                  _shareImage(base64Image);
+                },
+                child: const Icon(
+                  Icons.share,
+                  color: Colors.white,
+                  size: 24.0,
+                ),
+              ),
+            ],
+          ),
+          Expanded(
+            child: PhotoViewGallery.builder(
+              scrollPhysics: const BouncingScrollPhysics(),
               itemCount: 1,
               builder: (context, index) {
                 return PhotoViewGalleryPageOptions(
@@ -583,43 +608,13 @@ void _showImageDialog(BuildContext context, String base64Image) {
                   heroAttributes: PhotoViewHeroAttributes(tag: index),
                 );
               },
-              scrollPhysics: const BouncingScrollPhysics(),
               backgroundDecoration: const BoxDecoration(
                 color: Colors.transparent,
               ),
               pageController: PageController(),
             ),
-            Align(
-              alignment: Alignment.topRight,
-              child: TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                child: const Icon(
-                  Icons.close, // Icono de cierre
-                  color: Colors.white, // Color del icono
-                  size: 24.0, // Tamaño del icono
-                ),
-              ),
-            ),
-            Align(
-              alignment: Alignment.topRight,
-              child: Container(
-                margin: const EdgeInsets.only(right: 50.0),
-                child: TextButton(
-                  onPressed: () {
-                    _shareImage(base64Image);
-                  },
-                  child: const Icon(
-                    Icons.share, // Icono de cierre
-                    color: Colors.white, // Color del icono
-                    size: 24.0, // Tamaño del icono
-                  ),
-                ),
-              ),
-            )
-          ],
-        ),
+          ),
+        ],
       );
     },
   );
@@ -758,10 +753,16 @@ Future<void> _llamada(context, String? uid, String? nroCP) async {
   String imei = androidInfo.id;
   String? nroCel;
   String? dispositivo = androidInfo.model;
+  String? nombreC;
+  String? mailC;
+  String? telC;
   final prefs = await SharedPreferences.getInstance();
   username = prefs.getString('username');
   password = prefs.getString('password');
   nroCel = prefs.getString("telC");
+  nombreC = prefs.getString("nombreC");
+  mailC = prefs.getString("mailC");
+  telC = prefs.getString("telC");
 
   final requestData = {
     'usuario': username,
@@ -773,23 +774,33 @@ Future<void> _llamada(context, String? uid, String? nroCP) async {
     "nota": "Solicito llamada",
   };
   print(requestData);
-  final response = await http.post(
-    Uri.parse(
-      'http://net.entreganet.com/RestServiceImpl.svc/Llamada',
-    ),
-    headers: <String, String>{
-      'Content-Type': 'application/json; charset=UTF-8',
-      "Access-Control-Allow-Origin": "*",
-      "Access-Control-Allow-Methods": "POST, GET, OPTIONS, PUT, DELETE, HEAD",
-    },
-    body: jsonEncode(requestData),
-  );
-  if (response.statusCode == 200) {
-    final dynamic jsonResponse = json.decode(response.body);
-    final String llamadaResult = jsonResponse["LlamadaResult"];
-    _showResponseModal(context, llamadaResult);
+  if (nombreC != "" && mailC != "" && telC != "") {
+    final response = await http.post(
+      Uri.parse(
+        'http://net.entreganet.com/RestServiceImpl.svc/Llamada',
+      ),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "POST, GET, OPTIONS, PUT, DELETE, HEAD",
+      },
+      body: jsonEncode(requestData),
+    );
+    if (response.statusCode == 200) {
+      final dynamic jsonResponse = json.decode(response.body);
+      final String llamadaResult = jsonResponse["LlamadaResult"];
+      _showResponseModal(context, llamadaResult);
+
+      print("nombreC=");
+      print(nombreC);
+      print(mailC);
+      print(telC);
+    } else {
+      throw Exception('Failed to send llamada');
+    }
   } else {
-    throw Exception('Failed to send llamada');
+    print("Perfil incompleto!");
+    _showIncompleteProfileModal(context);
   }
 }
 
@@ -824,10 +835,16 @@ Future<void> _rechazo(
   String imei = androidInfo.id;
   String? nroCel;
   String? dispositivo = androidInfo.model;
+  String? nombreC;
+  String? mailC;
+  String? telC;
   final prefs = await SharedPreferences.getInstance();
   username = prefs.getString('username');
   password = prefs.getString('password');
   nroCel = prefs.getString("telC");
+  nombreC = prefs.getString("nombreC");
+  mailC = prefs.getString("mailC");
+  telC = prefs.getString("telC");
 
   final requestData = {
     'usuario': username,
@@ -840,30 +857,35 @@ Future<void> _rechazo(
     "idfl": uid
   };
   print(requestData);
-  final response = await http.post(
-    Uri.parse(
-      'http://net.entreganet.com/RestServiceImpl.svc/Rechazos',
-    ),
-    headers: <String, String>{
-      'Content-Type': 'application/json; charset=UTF-8',
-      "Access-Control-Allow-Origin": "*",
-      "Access-Control-Allow-Methods": "POST, GET, OPTIONS, PUT, DELETE, HEAD",
-    },
-    body: jsonEncode(requestData),
-  );
-  if (response.statusCode == 200) {
-    print(response.body);
+  if (nombreC != "" && mailC != "" && telC != "") {
+    final response = await http.post(
+      Uri.parse(
+        'http://net.entreganet.com/RestServiceImpl.svc/Rechazos',
+      ),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "POST, GET, OPTIONS, PUT, DELETE, HEAD",
+      },
+      body: jsonEncode(requestData),
+    );
+    if (response.statusCode == 200) {
+      print(response.body);
 
-    // Navegar a /home
-    Navigator.pushNamed(context, "/home");
+      // Navegar a /home
+      Navigator.pushNamed(context, "/home");
 
-    // Esperar unos segundos (opcional)
-    await Future.delayed(const Duration(milliseconds: 300));
+      // Esperar unos segundos (opcional)
+      await Future.delayed(const Duration(milliseconds: 300));
 
-    // Navegar a /alert
-    Navigator.pushNamed(context, "/alert");
+      // Navegar a /alert
+      Navigator.pushNamed(context, "/alert");
+    } else {
+      throw Exception('Failed to send llamada');
+    }
   } else {
-    throw Exception('Failed to send llamada');
+    print("Perfil incompleto!");
+    _showIncompleteProfileModal(context);
   }
 }
 
@@ -878,10 +900,16 @@ Future<void> _autorizado(
   String imei = androidInfo.id;
   String? nroCel;
   String? dispositivo = androidInfo.model;
+  String? nombreC;
+  String? mailC;
+  String? telC;
   final prefs = await SharedPreferences.getInstance();
   username = prefs.getString('username');
   password = prefs.getString('password');
   nroCel = prefs.getString("telC");
+  nombreC = prefs.getString("nombreC");
+  mailC = prefs.getString("mailC");
+  telC = prefs.getString("telC");
 
   final requestData = {
     'usuario': username,
@@ -894,30 +922,35 @@ Future<void> _autorizado(
     "idfl": uid
   };
   print(requestData);
-  final response = await http.post(
-    Uri.parse(
-      'http://net.entreganet.com/RestServiceImpl.svc/Autorizado',
-    ),
-    headers: <String, String>{
-      'Content-Type': 'application/json; charset=UTF-8',
-      "Access-Control-Allow-Origin": "*",
-      "Access-Control-Allow-Methods": "POST, GET, OPTIONS, PUT, DELETE, HEAD",
-    },
-    body: jsonEncode(requestData),
-  );
-  if (response.statusCode == 200) {
-    print(response.body);
+  if (nombreC != "" && mailC != "" && telC != "") {
+    final response = await http.post(
+      Uri.parse(
+        'http://net.entreganet.com/RestServiceImpl.svc/Autorizado',
+      ),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "POST, GET, OPTIONS, PUT, DELETE, HEAD",
+      },
+      body: jsonEncode(requestData),
+    );
+    if (response.statusCode == 200) {
+      print(response.body);
 
-    // Navegar a /home
-    Navigator.pushNamed(context, "/home");
+      // Navegar a /home
+      Navigator.pushNamed(context, "/home");
 
-    // Esperar unos segundos (opcional)
-    await Future.delayed(const Duration(milliseconds: 300));
+      // Esperar unos segundos (opcional)
+      await Future.delayed(const Duration(milliseconds: 300));
 
-    // Navegar a /alert
-    Navigator.pushNamed(context, "/alert");
+      // Navegar a /alert
+      Navigator.pushNamed(context, "/alert");
+    } else {
+      throw Exception('Failed to send llamada');
+    }
   } else {
-    throw Exception('Failed to send llamada');
+    print("Perfil incompleto!");
+    _showIncompleteProfileModal(context);
   }
 }
 
@@ -931,10 +964,16 @@ Future<void> _leido(context, String? uid, String? nroCP, String? idSit) async {
   String imei = androidInfo.id;
   String? nroCel;
   String? dispositivo = androidInfo.model;
+  String? nombreC;
+  String? mailC;
+  String? telC;
   final prefs = await SharedPreferences.getInstance();
   username = prefs.getString('username');
   password = prefs.getString('password');
   nroCel = prefs.getString("telC");
+  nombreC = prefs.getString("nombreC");
+  mailC = prefs.getString("mailC");
+  telC = prefs.getString("telC");
 
   final requestData = {
     'usuario': username,
@@ -947,29 +986,58 @@ Future<void> _leido(context, String? uid, String? nroCP, String? idSit) async {
     "idfl": uid
   };
   print(requestData);
-  final response = await http.post(
-    Uri.parse(
-      'http://net.entreganet.com/RestServiceImpl.svc/Hablados',
-    ),
-    headers: <String, String>{
-      'Content-Type': 'application/json; charset=UTF-8',
-      "Access-Control-Allow-Origin": "*",
-      "Access-Control-Allow-Methods": "POST, GET, OPTIONS, PUT, DELETE, HEAD",
-    },
-    body: jsonEncode(requestData),
-  );
-  if (response.statusCode == 200) {
-    print(response.body);
+  if (nombreC != "" && mailC != "" && telC != "") {
+    final response = await http.post(
+      Uri.parse(
+        'http://net.entreganet.com/RestServiceImpl.svc/Hablados',
+      ),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "POST, GET, OPTIONS, PUT, DELETE, HEAD",
+      },
+      body: jsonEncode(requestData),
+    );
+    if (response.statusCode == 200) {
+      print(response.body);
 
-    // Navegar a /home
-    Navigator.pushNamed(context, "/home");
+      // Navegar a /home
+      Navigator.pushNamed(context, "/home");
 
-    // Esperar unos segundos (opcional)
-    await Future.delayed(const Duration(milliseconds: 300));
+      // Esperar unos segundos (opcional)
+      await Future.delayed(const Duration(milliseconds: 300));
 
-    // Navegar a /alert
-    Navigator.pushNamed(context, "/alert");
+      // Navegar a /alert
+      Navigator.pushNamed(context, "/alert");
+    } else {
+      throw Exception('Failed to send llamada');
+    }
   } else {
-    throw Exception('Failed to send llamada');
+    print("Perfil incompleto!");
+    _showIncompleteProfileModal(context);
   }
+}
+
+// Función para mostrar el modal de perfil incompleto
+void _showIncompleteProfileModal(BuildContext context) {
+  showDialog(
+    context: context,
+    builder: (context) {
+      return AlertDialog(
+        title: const Text('Perfil incompleto'),
+        content: const Text(
+            'Por favor, completa tu perfil antes de enviar la llamada.'),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop(); // Cierra el modal
+              Navigator.pushReplacementNamed(
+                  context, '/perfil'); // Navega a la nueva ruta
+            },
+            child: const Text('OK'),
+          ),
+        ],
+      );
+    },
+  );
 }
