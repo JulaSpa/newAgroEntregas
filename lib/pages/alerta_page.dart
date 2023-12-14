@@ -774,7 +774,12 @@ Future<void> _llamada(context, String? uid, String? nroCP) async {
     "nota": "Solicito llamada",
   };
   print(requestData);
-  if (nombreC != "" && mailC != "" && telC != "") {
+  if (nombreC != "" &&
+      nombreC != null &&
+      mailC != "" &&
+      mailC != null &&
+      telC != "" &&
+      telC != null) {
     final response = await http.post(
       Uri.parse(
         'http://net.entreganet.com/RestServiceImpl.svc/Llamada',
@@ -857,7 +862,12 @@ Future<void> _rechazo(
     "idfl": uid
   };
   print(requestData);
-  if (nombreC != "" && mailC != "" && telC != "") {
+  if (nombreC != "" &&
+      nombreC != null &&
+      mailC != "" &&
+      mailC != null &&
+      telC != "" &&
+      telC != null) {
     final response = await http.post(
       Uri.parse(
         'http://net.entreganet.com/RestServiceImpl.svc/Rechazos',
@@ -922,7 +932,12 @@ Future<void> _autorizado(
     "idfl": uid
   };
   print(requestData);
-  if (nombreC != "" && mailC != "" && telC != "") {
+  if (nombreC != "" &&
+      nombreC != null &&
+      mailC != "" &&
+      mailC != null &&
+      telC != "" &&
+      telC != null) {
     final response = await http.post(
       Uri.parse(
         'http://net.entreganet.com/RestServiceImpl.svc/Autorizado',
@@ -986,7 +1001,12 @@ Future<void> _leido(context, String? uid, String? nroCP, String? idSit) async {
     "idfl": uid
   };
   print(requestData);
-  if (nombreC != "" && mailC != "" && telC != "") {
+  if (nombreC != "" &&
+      nombreC != null &&
+      mailC != "" &&
+      mailC != null &&
+      telC != "" &&
+      telC != null) {
     final response = await http.post(
       Uri.parse(
         'http://net.entreganet.com/RestServiceImpl.svc/Hablados',
