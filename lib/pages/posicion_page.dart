@@ -25,12 +25,15 @@ class _PositionState extends State<Position> {
   late Future<List<Album>> futureAlbum;
   bool isLoading =
       true; // Agregar una variable para rastrear si se está cargando
-
+  //BUSCAR POR PALABRA CLAVE
+  var searchController = TextEditingController();
+  String ordenarPor = 'Seleccionar';
   @override
   void initState() {
     super.initState();
     // Obtener los valores de SharedPreferences
     _getStoredUserData();
+    ordenarPor = 'Seleccionar';
   }
 
   Future<void> _getStoredUserData() async {
@@ -92,6 +95,8 @@ class _PositionState extends State<Position> {
     }
   }
 
+  bool isOptionsVisible = false;
+
   @override
   Widget build(BuildContext context) {
     return Stack(
@@ -114,396 +119,553 @@ class _PositionState extends State<Position> {
             toolbarHeight: 60,
             iconTheme: const IconThemeData(color: Colors.white),
             automaticallyImplyLeading: true,
+            actions: [
+              GestureDetector(
+                onTap: () {
+                  // Toggle the visibility of options
+                  setState(() {
+                    isOptionsVisible = !isOptionsVisible;
+                  });
+                },
+                child: const Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: Icon(Icons.search),
+                ),
+              ),
+            ],
           ),
           body: DecoratedBox(
-            decoration: const BoxDecoration(
-              color: Color.fromRGBO(255, 255, 255, 0.863),
-            ),
-            child: isLoading
-                ? const Center(
-                    child: CircularProgressIndicator(),
-                  )
-                : FutureBuilder<List<Album>>(
-                    future: futureAlbum,
-                    builder: (context, snapshot) {
-                      if (snapshot.hasData) {
-                        var albums = snapshot.data!;
-                        return ListView.builder(
-                          itemCount: albums.length,
-                          itemBuilder: (context, index) {
-                            var album = albums[index];
-                            var situacion = album.nombreSit;
-                            //print(NroCP);
-                            var rech = situacion.toString();
-                            situacion = situacion.replaceFirst(
-                                situacion[0], situacion[0].toUpperCase());
-                            Map<String, Color> colorMap = {
-                              "RECHAZO": Colors.red,
-                              "CALADO": Colors.green,
-                              "AUTORIZADO":
-                                  const Color.fromARGB(255, 3, 1, 126),
-                              "POSICION": Colors.lightBlue,
-                              "DEMORADO": Colors.yellow,
-                              "EN TRANSITO": Colors.pink,
-                              "PROBLEMA EN C.P.": Colors.brown,
-                              "HABLADO PROBLEMA CP":
-                                  const Color.fromARGB(255, 176, 39, 96),
-                              "DESCARGADO": const Color.fromARGB(255, 2, 99, 5),
-                              "SIN CUPO": Colors.green,
-                              "SOLICITA RECHAZO": Colors.purple,
-                              "HABLADO": const Color.fromARGB(255, 176, 39, 96),
-                              "HABLADO RECHAZO":
-                                  const Color.fromARGB(255, 176, 39, 96),
-                              "HABLADO SIN CUPO":
-                                  const Color.fromARGB(255, 176, 39, 96),
-                              "DESVIADO": Colors.black
-                            };
+              decoration: const BoxDecoration(
+                color: Color.fromRGBO(255, 255, 255, 0.863),
+              ),
+              child: isLoading
+                  ? const Center(
+                      child: CircularProgressIndicator(),
+                    )
+                  : Column(children: [
+                      // Opción "Buscar por palabra clave"
+                      Column(
+                        children: [
+                          if (isOptionsVisible)
+                            ListTile(
+                              title: TextField(
+                                controller: searchController,
+                                decoration: const InputDecoration(
+                                  hintText: 'Buscar por palabra clave',
+                                ),
+                                onChanged: (text) {
+                                  setState(() {
+                                    // Actualizar el estado del controlador
+                                    searchController.text = text;
+                                  });
+                                },
+                              ),
+                            ),
+                          // Ordenar por
+                          if (isOptionsVisible)
+                            // Ordenar por
 
-                            Color backgroundColor =
-                                colorMap[rech] ?? Colors.grey;
+                            OptionWidget(
+                              title: 'Ordernar por:',
+                              selectedValue: ordenarPor,
+                              onSelected: (value) {
+                                setState(() {
+                                  ordenarPor = value;
+                                });
+                                print('Opción seleccionada: $value');
+                              },
+                            ),
+                        ],
+                      ),
 
-                            return Column(
-                              children: [
-                                Container(
-                                  color: backgroundColor,
-                                  child: Row(
+                      Expanded(
+                        child: FutureBuilder<List<Album>>(
+                          future: futureAlbum,
+                          builder: (context, snapshot) {
+                            if (snapshot.hasData) {
+                              var albums = snapshot.data!;
+                              // Filtrar la lista según el texto del searchController
+                              var filteredAlbums = albums
+                                  .where((album) =>
+                                      album.nroCP.toLowerCase().startsWith(searchController.text.toLowerCase()) ||
+                                      album.xtitular.toLowerCase().startsWith(
+                                          searchController.text
+                                              .toLowerCase()) ||
+                                      album.xcorredor.toLowerCase().startsWith(
+                                          searchController.text
+                                              .toLowerCase()) ||
+                                      album.xdestinatario
+                                          .toLowerCase()
+                                          .startsWith(searchController.text
+                                              .toLowerCase()) ||
+                                      album.xdestino.toLowerCase().startsWith(
+                                          searchController.text
+                                              .toLowerCase()) ||
+                                      album.nombreMe.toLowerCase().startsWith(
+                                          searchController.text.toLowerCase()) ||
+                                      album.nombrePrc.toLowerCase().startsWith(searchController.text.toLowerCase()) ||
+                                      album.chasisFl.toLowerCase().startsWith(searchController.text.toLowerCase()) ||
+                                      album.acopreFl.toLowerCase().startsWith(searchController.text.toLowerCase()) ||
+                                      album.rem2.toLowerCase().startsWith(searchController.text.toLowerCase()) ||
+                                      album.remCom.toLowerCase().startsWith(searchController.text.toLowerCase()) ||
+                                      album.rem1.toLowerCase().startsWith(searchController.text.toLowerCase()) ||
+                                      album.rem3.toLowerCase().startsWith(searchController.text.toLowerCase()) ||
+                                      album.xcorredor1.toLowerCase().startsWith(searchController.text.toLowerCase()) ||
+                                      album.xcorredor2.toLowerCase().startsWith(searchController.text.toLowerCase()))
+                                  .toList();
+                              //ordenar desc nro cp
+                              // Ordenar la lista según la opción seleccionada
+                              if (ordenarPor == 'Numerocp') {
+                                filteredAlbums.sort((a, b) => int.parse(a.nroCP)
+                                    .compareTo(int.parse(b.nroCP)));
+                              } else if (ordenarPor == 'Puerto') {
+                                filteredAlbums.sort((a, b) {
+                                  // Función de comparación personalizada para ordenar por puerto
+                                  if (a.xdestino.startsWith('A') &&
+                                      !b.xdestino.startsWith('A')) {
+                                    return -1; // 'A' viene primero
+                                  } else if (!a.xdestino.startsWith('A') &&
+                                      b.xdestino.startsWith('A')) {
+                                    return 1; // 'A' va después de otros
+                                  } else {
+                                    return a.xdestino.compareTo(b.xdestino);
+                                  }
+                                });
+                              } else if (ordenarPor == 'Situación') {
+                                filteredAlbums.sort((a, b) {
+                                  // Función de comparación personalizada para ordenar por situación
+                                  return a.nombreSit.compareTo(b.nombreSit);
+                                });
+                              }
+                              return ListView.builder(
+                                itemCount: filteredAlbums.length,
+                                itemBuilder: (context, index) {
+                                  var album = filteredAlbums[index];
+                                  var situacion = album.nombreSit;
+                                  //print(NroCP);
+                                  var rech = situacion.toString();
+                                  situacion = situacion.replaceFirst(
+                                      situacion[0], situacion[0].toUpperCase());
+                                  Map<String, Color> colorMap = {
+                                    "RECHAZO": Colors.red,
+                                    "CALADO": Colors.green,
+                                    "AUTORIZADO":
+                                        const Color.fromARGB(255, 3, 1, 126),
+                                    "POSICION": Colors.lightBlue,
+                                    "DEMORADO": Colors.yellow,
+                                    "EN TRANSITO": Colors.pink,
+                                    "PROBLEMA EN C.P.": Colors.brown,
+                                    "HABLADO PROBLEMA CP":
+                                        const Color.fromARGB(255, 176, 39, 96),
+                                    "DESCARGADO":
+                                        const Color.fromARGB(255, 2, 99, 5),
+                                    "SIN CUPO": Colors.green,
+                                    "SOLICITA RECHAZO": Colors.purple,
+                                    "HABLADO":
+                                        const Color.fromARGB(255, 176, 39, 96),
+                                    "HABLADO RECHAZO":
+                                        const Color.fromARGB(255, 176, 39, 96),
+                                    "HABLADO SIN CUPO":
+                                        const Color.fromARGB(255, 176, 39, 96),
+                                    "DESVIADO": Colors.black
+                                  };
+
+                                  Color backgroundColor =
+                                      colorMap[rech] ?? Colors.grey;
+
+                                  return Column(
                                     children: [
-                                      Padding(
-                                        padding: const EdgeInsetsDirectional
-                                            .fromSTEB(35, 10, 5, 10),
-                                        child: Icon(
-                                          (album.idSit == "RCZO")
-                                              ? Icons.cancel
-                                              : (album.idSit == "AUTO")
-                                                  ? Icons.check
-                                                  : (album.idSit == "DEMO")
-                                                      ? Icons.access_time
-                                                      : (album.idSit == "PECP")
-                                                          ? Icons.change_history
-                                                          : (album.idSit ==
-                                                                  "SCUP")
-                                                              ? Icons
-                                                                  .stop_circle
-                                                              : (album.idSit ==
-                                                                      "SRZO")
-                                                                  ? Icons
-                                                                      .change_history
-                                                                  : (album.idSit ==
-                                                                          "HABL")
-                                                                      ? Icons
-                                                                          .check
-                                                                      : (album.idSit ==
-                                                                              "HRZO")
-                                                                          ? Icons
-                                                                              .change_history
-                                                                          : (album.idSit == "HPCP")
-                                                                              ? Icons.change_history
-                                                                              : (album.idSit == "HSCU")
-                                                                                  ? Icons.stop_circle
-                                                                                  : (album.idSit == "DESC")
-                                                                                      ? Icons.check
-                                                                                      : Icons.change_history,
-                                          color: Colors.white,
-                                          size: 30,
+                                      Container(
+                                        color: backgroundColor,
+                                        child: Row(
+                                          children: [
+                                            Padding(
+                                              padding:
+                                                  const EdgeInsetsDirectional
+                                                      .fromSTEB(35, 10, 5, 10),
+                                              child: Icon(
+                                                (album.idSit == "RCZO")
+                                                    ? Icons.cancel
+                                                    : (album.idSit == "AUTO")
+                                                        ? Icons.check
+                                                        : (album.idSit ==
+                                                                "DEMO")
+                                                            ? Icons.access_time
+                                                            : (album.idSit ==
+                                                                    "PECP")
+                                                                ? Icons
+                                                                    .change_history
+                                                                : (album.idSit ==
+                                                                        "SCUP")
+                                                                    ? Icons
+                                                                        .stop_circle
+                                                                    : (album.idSit ==
+                                                                            "SRZO")
+                                                                        ? Icons
+                                                                            .change_history
+                                                                        : (album.idSit ==
+                                                                                "HABL")
+                                                                            ? Icons.check
+                                                                            : (album.idSit == "HRZO")
+                                                                                ? Icons.change_history
+                                                                                : (album.idSit == "HPCP")
+                                                                                    ? Icons.change_history
+                                                                                    : (album.idSit == "HSCU")
+                                                                                        ? Icons.stop_circle
+                                                                                        : (album.idSit == "DESC")
+                                                                                            ? Icons.check
+                                                                                            : Icons.change_history,
+                                                color: Colors.white,
+                                                size: 30,
+                                              ),
+                                            ),
+                                            Padding(
+                                              padding:
+                                                  const EdgeInsetsDirectional
+                                                      .fromSTEB(0, 10, 0, 10),
+                                              child: Text(
+                                                situacion,
+                                                style: const TextStyle(
+                                                  fontSize: 20,
+                                                  color: Colors.white,
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Row(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              const Padding(
+                                                padding: EdgeInsetsDirectional
+                                                    .fromSTEB(40, 10, 0, 0),
+                                                child: Text(
+                                                  "TITULAR: ",
+                                                  style: TextStyle(
+                                                    fontSize: 15,
+                                                    color: Colors.black,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
+                                              ),
+                                              Expanded(
+                                                child: Padding(
+                                                  padding:
+                                                      const EdgeInsetsDirectional
+                                                          .fromSTEB(
+                                                          0, 10, 0, 0),
+                                                  child: Text(
+                                                    album.xtitular
+                                                        .toUpperCase(),
+                                                    style: const TextStyle(
+                                                      fontSize: 15,
+                                                      color: Colors.lightBlue,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                      Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Row(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              const Padding(
+                                                padding: EdgeInsetsDirectional
+                                                    .fromSTEB(40, 0, 0, 0),
+                                                child: Text(
+                                                  "PROCEDENCIA: ",
+                                                  style: TextStyle(
+                                                    fontSize: 15,
+                                                    color: Colors.black,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
+                                              ),
+                                              Expanded(
+                                                child: Text(
+                                                  album.nombrePrc.toUpperCase(),
+                                                  style: const TextStyle(
+                                                    fontSize: 15,
+                                                    color: Colors.lightBlue,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                      Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Row(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              const Padding(
+                                                padding: EdgeInsetsDirectional
+                                                    .fromSTEB(40, 0, 0, 0),
+                                                child: Text(
+                                                  "NÚMERO CP: ",
+                                                  style: TextStyle(
+                                                    fontSize: 15,
+                                                    color: Colors.black,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
+                                              ),
+                                              Expanded(
+                                                child: Text(
+                                                  album.nroCP.toUpperCase(),
+                                                  style: const TextStyle(
+                                                    fontSize: 15,
+                                                    color: Colors.lightBlue,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                      Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Row(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              const Padding(
+                                                padding: EdgeInsetsDirectional
+                                                    .fromSTEB(40, 0, 0, 0),
+                                                child: Text(
+                                                  "CORREDOR: ",
+                                                  style: TextStyle(
+                                                    fontSize: 15,
+                                                    color: Colors.black,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
+                                              ),
+                                              Expanded(
+                                                child: Text(
+                                                  album.xcorredor.toUpperCase(),
+                                                  style: const TextStyle(
+                                                    fontSize: 15,
+                                                    color: Colors.lightBlue,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                      Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Row(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              const Padding(
+                                                padding: EdgeInsetsDirectional
+                                                    .fromSTEB(40, 0, 0, 0),
+                                                child: Text(
+                                                  "OBSERVACION: ",
+                                                  style: TextStyle(
+                                                    fontSize: 15,
+                                                    color: Colors.black,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
+                                              ),
+                                              Expanded(
+                                                child: Text(
+                                                  album.observacionesana
+                                                      .toUpperCase(),
+                                                  style: const TextStyle(
+                                                    fontSize: 15,
+                                                    color: Colors.lightBlue,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                      Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Row(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              const Padding(
+                                                padding: EdgeInsetsDirectional
+                                                    .fromSTEB(40, 0, 0, 0),
+                                                child: Text(
+                                                  "PATENTE CAMIÓN: ",
+                                                  style: TextStyle(
+                                                    fontSize: 15,
+                                                    color: Colors.black,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
+                                              ),
+                                              Expanded(
+                                                child: Text(
+                                                  album.chasisFl.toUpperCase(),
+                                                  style: const TextStyle(
+                                                    fontSize: 15,
+                                                    color: Colors.lightBlue,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                      InkWell(
+                                        onTap: () async {
+                                          final String nroCP = album.nroCP;
+                                          final prefs = await SharedPreferences
+                                              .getInstance();
+                                          await prefs.setString('nroCP', nroCP);
+                                          _downLoad(username, password, nroCP,
+                                              context);
+                                        },
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Row(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                const Padding(
+                                                  padding: EdgeInsetsDirectional
+                                                      .fromSTEB(40, 0, 0, 0),
+                                                  child: Text(
+                                                    "IMAGEN: ",
+                                                    style: TextStyle(
+                                                      fontSize: 15,
+                                                      color: Colors.black,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                    ),
+                                                  ),
+                                                ),
+                                                Expanded(
+                                                  child: Text(
+                                                    album.imagen,
+                                                    style: const TextStyle(
+                                                      fontSize: 15,
+                                                      color: Colors.lightBlue,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ],
                                         ),
                                       ),
                                       Padding(
                                         padding: const EdgeInsetsDirectional
                                             .fromSTEB(0, 10, 0, 10),
-                                        child: Text(
-                                          situacion,
-                                          style: const TextStyle(
-                                            fontSize: 20,
-                                            color: Colors.white,
-                                          ),
+                                        child: ElevatedButton(
+                                          onPressed: () {
+                                            Navigator.of(context).push(
+                                              MaterialPageRoute(
+                                                builder: (context) =>
+                                                    AlertDetails(album: album),
+                                              ),
+                                            );
+                                          },
+                                          child: const Text("Más información"),
                                         ),
                                       ),
                                     ],
-                                  ),
-                                ),
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Row(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        const Padding(
-                                          padding:
-                                              EdgeInsetsDirectional.fromSTEB(
-                                                  40, 10, 0, 0),
-                                          child: Text(
-                                            "TITULAR: ",
-                                            style: TextStyle(
-                                              fontSize: 15,
-                                              color: Colors.black,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                        ),
-                                        Expanded(
-                                          child: Padding(
-                                            padding: const EdgeInsetsDirectional
-                                                .fromSTEB(0, 10, 0, 0),
-                                            child: Text(
-                                              album.xtitular.toUpperCase(),
-                                              style: const TextStyle(
-                                                fontSize: 15,
-                                                color: Colors.lightBlue,
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Row(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        const Padding(
-                                          padding:
-                                              EdgeInsetsDirectional.fromSTEB(
-                                                  40, 0, 0, 0),
-                                          child: Text(
-                                            "PROCEDENCIA: ",
-                                            style: TextStyle(
-                                              fontSize: 15,
-                                              color: Colors.black,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                        ),
-                                        Expanded(
-                                          child: Text(
-                                            album.nombrePrc.toUpperCase(),
-                                            style: const TextStyle(
-                                              fontSize: 15,
-                                              color: Colors.lightBlue,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Row(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        const Padding(
-                                          padding:
-                                              EdgeInsetsDirectional.fromSTEB(
-                                                  40, 0, 0, 0),
-                                          child: Text(
-                                            "NÚMERO CP: ",
-                                            style: TextStyle(
-                                              fontSize: 15,
-                                              color: Colors.black,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                        ),
-                                        Expanded(
-                                          child: Text(
-                                            album.nroCP.toUpperCase(),
-                                            style: const TextStyle(
-                                              fontSize: 15,
-                                              color: Colors.lightBlue,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Row(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        const Padding(
-                                          padding:
-                                              EdgeInsetsDirectional.fromSTEB(
-                                                  40, 0, 0, 0),
-                                          child: Text(
-                                            "CORREDOR: ",
-                                            style: TextStyle(
-                                              fontSize: 15,
-                                              color: Colors.black,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                        ),
-                                        Expanded(
-                                          child: Text(
-                                            album.xcorredor.toUpperCase(),
-                                            style: const TextStyle(
-                                              fontSize: 15,
-                                              color: Colors.lightBlue,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Row(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        const Padding(
-                                          padding:
-                                              EdgeInsetsDirectional.fromSTEB(
-                                                  40, 0, 0, 0),
-                                          child: Text(
-                                            "OBSERVACION: ",
-                                            style: TextStyle(
-                                              fontSize: 15,
-                                              color: Colors.black,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                        ),
-                                        Expanded(
-                                          child: Text(
-                                            album.observacionesana
-                                                .toUpperCase(),
-                                            style: const TextStyle(
-                                              fontSize: 15,
-                                              color: Colors.lightBlue,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Row(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        const Padding(
-                                          padding:
-                                              EdgeInsetsDirectional.fromSTEB(
-                                                  40, 0, 0, 0),
-                                          child: Text(
-                                            "PATENTE CAMIÓN: ",
-                                            style: TextStyle(
-                                              fontSize: 15,
-                                              color: Colors.black,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                        ),
-                                        Expanded(
-                                          child: Text(
-                                            album.chasisFl.toUpperCase(),
-                                            style: const TextStyle(
-                                              fontSize: 15,
-                                              color: Colors.lightBlue,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                                InkWell(
-                                  onTap: () async {
-                                    final String nroCP = album.nroCP;
-                                    final prefs =
-                                        await SharedPreferences.getInstance();
-                                    await prefs.setString('nroCP', nroCP);
-                                    _downLoad(
-                                        username, password, nroCP, context);
-                                  },
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Row(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          const Padding(
-                                            padding:
-                                                EdgeInsetsDirectional.fromSTEB(
-                                                    40, 0, 0, 0),
-                                            child: Text(
-                                              "IMAGEN: ",
-                                              style: TextStyle(
-                                                fontSize: 15,
-                                                color: Colors.black,
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                            ),
-                                          ),
-                                          Expanded(
-                                            child: Text(
-                                              album.imagen,
-                                              style: const TextStyle(
-                                                fontSize: 15,
-                                                color: Colors.lightBlue,
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                Padding(
-                                  padding: const EdgeInsetsDirectional.fromSTEB(
-                                      0, 10, 0, 10),
-                                  child: ElevatedButton(
-                                    onPressed: () {
-                                      Navigator.of(context).push(
-                                        MaterialPageRoute(
-                                          builder: (context) =>
-                                              AlertDetails(album: album),
-                                        ),
-                                      );
-                                    },
-                                    child: const Text("Más información"),
-                                  ),
-                                ),
-                              ],
-                            );
+                                  );
+                                },
+                              );
+                            } else {
+                              return const Center(
+                                child: CircularProgressIndicator(),
+                              );
+                            }
                           },
-                        );
-                      } else {
-                        return const Center(
-                          child: CircularProgressIndicator(),
-                        );
-                      }
-                    },
-                  ),
-          ),
+                        ),
+                      )
+                    ])),
         ),
       ],
+    );
+  }
+}
+
+class OptionWidget extends StatelessWidget {
+  final String title;
+  final String selectedValue;
+  final Function(String) onSelected;
+
+  const OptionWidget({
+    Key? key,
+    required this.title,
+    required this.selectedValue,
+    required this.onSelected,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      title: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(title),
+          if (title == 'Ordernar por:')
+            DropdownButton<String>(
+              value: selectedValue, // Establecer el valor seleccionado
+              onChanged: (String? value) {
+                if (value != null) {
+                  // Llama al callback con la opción seleccionada
+                  onSelected(value);
+                }
+              },
+              items: ['Seleccionar', 'Numerocp', 'Puerto', 'Situación']
+                  .map<DropdownMenuItem<String>>(
+                    (String value) => DropdownMenuItem<String>(
+                      value: value,
+                      child: Text(value),
+                    ),
+                  )
+                  .toList(),
+            ),
+        ],
+      ),
     );
   }
 }

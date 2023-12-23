@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:platform_device_id_v3/platform_device_id.dart';
 
 class Perfil extends StatefulWidget {
   const Perfil({super.key});
@@ -14,6 +15,7 @@ class _PerfilState extends State<Perfil> {
   String? username;
   String? password;
   String? tok;
+  String? deviceId;
   var nombre = TextEditingController();
   var mail = TextEditingController();
   var telefono = TextEditingController();
@@ -26,6 +28,7 @@ class _PerfilState extends State<Perfil> {
     super.initState();
     // Obtener los valores de SharedPreferences
     _getStoredUserData();
+    _getDeviceId();
   }
 
   Future<void> _getStoredUserData() async {
@@ -45,6 +48,15 @@ class _PerfilState extends State<Perfil> {
     print(prefs.getBool("alertC"));
     print(prefs.getBool("msjC")); */
     print(prefs.getBool("msjC"));
+  }
+
+  Future<void> _getDeviceId() async {
+    try {
+      deviceId = await PlatformDeviceId.getDeviceId;
+    } catch (e) {
+      print("Error al obtener el identificador del dispositivo: $e");
+      deviceId = null;
+    }
   }
 
   @override
@@ -208,6 +220,7 @@ class _PerfilState extends State<Perfil> {
                   final String nombreC = nombre.text;
                   final String mailC = mail.text;
                   final String telC = telefono.text;
+                  final String uuid = deviceId!;
                   final bool alertC = alertCheck;
                   final bool msjC = msjCheck;
                   // Guardar en SharedPreferences
@@ -218,6 +231,7 @@ class _PerfilState extends State<Perfil> {
                   await prefs.setString('nombreC', nombreC);
                   await prefs.setString('mailC', mailC);
                   await prefs.setString('telC', telC);
+                  await prefs.setString("uuid", uuid);
                   await prefs.setBool('alertC', alertC);
                   await prefs.setBool('msjC', msjC);
 
@@ -228,7 +242,7 @@ class _PerfilState extends State<Perfil> {
                     "token": tok,
                     "alertas": alertC,
                     "mensajes": msjC,
-                    "uuid": "1234"
+                    "uuid": uuid
                   };
                   final response = await http.post(
                     Uri.parse(
@@ -244,8 +258,9 @@ class _PerfilState extends State<Perfil> {
                   );
                   if (response.statusCode == 200) {
                     print("INFO GUARDADA");
-                    print(response.body);
+                    /* print(response.body);
                     print(msjC);
+                    print(requestData); */
                   } else {
                     throw Exception('Cant send data to firebase');
                   }
