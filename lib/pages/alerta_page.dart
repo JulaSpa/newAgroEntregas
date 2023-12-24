@@ -364,7 +364,8 @@ class _AlertState extends State<Alert> {
                                                         rech,
                                                         allIndicesAreRCZO,
                                                         allIndicesAreDEMO,
-                                                        selectedIndices);
+                                                        selectedIndices,
+                                                        albums);
                                                   },
                                                 ),
                                               ),
@@ -831,7 +832,8 @@ void _showOptionsModal(
     String? rech,
     bool? allIndicesAreRCZO,
     bool? allIndicesAreDEMO,
-    List<int> selectedIndices) {
+    List<int> selectedIndices,
+    List albums) {
   print(uid);
 
   showModalBottomSheet(
@@ -855,8 +857,8 @@ void _showOptionsModal(
                           IconButton(
                             onPressed: () {
                               // Acción para la opción api rechazo cgt
-                              _rechazo(
-                                  context, uid, nroCP, idSit, selectedIndices);
+                              _rechazo(context, uid, nroCP, idSit,
+                                  selectedIndices, albums);
                             },
                             icon: const Icon(
                               Icons.cancel,
@@ -878,7 +880,8 @@ void _showOptionsModal(
                           IconButton(
                             onPressed: () {
                               // Acción para la opción api rechazo cgt
-                              _autorizado(context, uid, nroCP, idSit);
+                              _autorizado(context, uid, nroCP, idSit,
+                                  selectedIndices, albums);
                               ;
                             },
                             icon: const Icon(
@@ -920,8 +923,9 @@ void _showOptionsModal(
                     child: Column(
                       children: [
                         IconButton(
-                          onPressed: () {
-                            _leido(context, uid, nroCP, idSit);
+                          onPressed: () async {
+                            await _leido(context, uid, nroCP, idSit,
+                                selectedIndices, albums);
                           },
                           icon: const Icon(Icons.visibility),
                           color: Colors.white,
@@ -1031,7 +1035,7 @@ void _showResponseModal(BuildContext context, String responseBody) {
 
 //API RECHAZO
 Future<void> _rechazo(context, String? uid, String? nroCP, String? idSit,
-    List<int> selectedIndices) async {
+    List<int> selectedIndices, List albums) async {
   DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
   AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
 
@@ -1050,49 +1054,52 @@ Future<void> _rechazo(context, String? uid, String? nroCP, String? idSit,
   nombreC = prefs.getString("nombreC");
   mailC = prefs.getString("mailC");
   telC = prefs.getString("telC");
-// Obtén la lista de nroCP correspondiente a los índices seleccionados
 
-  final requestData = {
-    'usuario': username,
-    'contraseña': password,
-    "nrocp": nroCP,
-    "imei": imei,
-    "numero": nroCel,
-    "dispositivo": dispositivo,
-    "situacion": idSit,
-    "idfl": uid
-  };
-  print(requestData);
   if (nombreC != "" &&
       nombreC != null &&
       mailC != "" &&
       mailC != null &&
       telC != "" &&
       telC != null) {
-    final response = await http.post(
-      Uri.parse(
-        'http://net.entreganet.com/RestServiceImpl.svc/Rechazos',
-      ),
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Methods": "POST, GET, OPTIONS, PUT, DELETE, HEAD",
-      },
-      body: jsonEncode(requestData),
-    );
-    if (response.statusCode == 200) {
-      print(response.body);
+    List<Map<String, dynamic>> requestDataList = selectedIndices.map((index) {
+      return {
+        'usuario': username,
+        'contraseña': password,
+        'nrocp': albums[index].nroCP,
+        'imei': imei,
+        'numero': nroCel,
+        'dispositivo': dispositivo,
+        'situacion': albums[index].idSit,
+        'idfl': albums[index].idFl,
+      };
+    }).toList();
+    for (var requestData in requestDataList) {
+      final response = await http.post(
+        Uri.parse(
+          'http://net.entreganet.com/RestServiceImpl.svc/Rechazos',
+        ),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Methods":
+              "POST, GET, OPTIONS, PUT, DELETE, HEAD",
+        },
+        body: jsonEncode(requestData),
+      );
+      if (response.statusCode == 200) {
+        print(response.body);
 
-      // Navegar a /home
-      Navigator.pushNamed(context, "/home");
+        // Navegar a /home
+        Navigator.pushNamed(context, "/home");
 
-      // Esperar unos segundos (opcional)
-      await Future.delayed(const Duration(milliseconds: 300));
+        // Esperar unos segundos (opcional)
+        await Future.delayed(const Duration(milliseconds: 300));
 
-      // Navegar a /alert
-      Navigator.pushNamed(context, "/alert");
-    } else {
-      throw Exception('Failed to send llamada');
+        // Navegar a /alert
+        Navigator.pushNamed(context, "/alert");
+      } else {
+        throw Exception('Failed to send llamada');
+      }
     }
   } else {
     print("Perfil incompleto!");
@@ -1101,8 +1108,8 @@ Future<void> _rechazo(context, String? uid, String? nroCP, String? idSit,
 }
 
 //API AUTORIZADO
-Future<void> _autorizado(
-    context, String? uid, String? nroCP, String? idSit) async {
+Future<void> _autorizado(context, String? uid, String? nroCP, String? idSit,
+    List<int> selectedIndices, List albums) async {
   DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
   AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
 
@@ -1122,47 +1129,50 @@ Future<void> _autorizado(
   mailC = prefs.getString("mailC");
   telC = prefs.getString("telC");
 
-  final requestData = {
-    'usuario': username,
-    'contraseña': password,
-    "nrocp": nroCP,
-    "imei": imei,
-    "numero": nroCel,
-    "dispositivo": dispositivo,
-    "nota": idSit,
-    "idfl": uid
-  };
-  print(requestData);
   if (nombreC != "" &&
       nombreC != null &&
       mailC != "" &&
       mailC != null &&
       telC != "" &&
       telC != null) {
-    final response = await http.post(
-      Uri.parse(
-        'http://net.entreganet.com/RestServiceImpl.svc/Autorizado',
-      ),
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Methods": "POST, GET, OPTIONS, PUT, DELETE, HEAD",
-      },
-      body: jsonEncode(requestData),
-    );
-    if (response.statusCode == 200) {
-      print(response.body);
+    List<Map<String, dynamic>> requestDataList = selectedIndices.map((index) {
+      return {
+        'usuario': username,
+        'contraseña': password,
+        'nrocp': albums[index].nroCP,
+        'imei': imei,
+        'numero': nroCel,
+        'dispositivo': dispositivo,
+        'idfl': albums[index].idFl,
+      };
+    }).toList();
+    for (var requestData in requestDataList) {
+      final response = await http.post(
+        Uri.parse(
+          'http://net.entreganet.com/RestServiceImpl.svc/Autorizado',
+        ),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Methods":
+              "POST, GET, OPTIONS, PUT, DELETE, HEAD",
+        },
+        body: jsonEncode(requestData),
+      );
+      if (response.statusCode == 200) {
+        print(response.body);
 
-      // Navegar a /home
-      Navigator.pushNamed(context, "/home");
+        // Navegar a /home
+        Navigator.pushNamed(context, "/home");
 
-      // Esperar unos segundos (opcional)
-      await Future.delayed(const Duration(milliseconds: 300));
+        // Esperar unos segundos (opcional)
+        await Future.delayed(const Duration(milliseconds: 300));
 
-      // Navegar a /alert
-      Navigator.pushNamed(context, "/alert");
-    } else {
-      throw Exception('Failed to send llamada');
+        // Navegar a /alert
+        Navigator.pushNamed(context, "/alert");
+      } else {
+        throw Exception('Failed to send llamada');
+      }
     }
   } else {
     print("Perfil incompleto!");
@@ -1171,7 +1181,8 @@ Future<void> _autorizado(
 }
 
 //LEIDO
-Future<void> _leido(context, String? uid, String? nroCP, String? idSit) async {
+Future<void> _leido(context, String? uid, String? nroCP, String? idSit,
+    List<int> selectedIndices, List albums) async {
   DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
   AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
 
@@ -1191,47 +1202,51 @@ Future<void> _leido(context, String? uid, String? nroCP, String? idSit) async {
   mailC = prefs.getString("mailC");
   telC = prefs.getString("telC");
 
-  final requestData = {
-    'usuario': username,
-    'contraseña': password,
-    "nrocp": nroCP,
-    "imei": imei,
-    "numero": nroCel,
-    "dispositivo": dispositivo,
-    "situacion": idSit,
-    "idfl": uid
-  };
-  print(requestData);
   if (nombreC != "" &&
       nombreC != null &&
       mailC != "" &&
       mailC != null &&
       telC != "" &&
       telC != null) {
-    final response = await http.post(
-      Uri.parse(
-        'http://net.entreganet.com/RestServiceImpl.svc/Hablados',
-      ),
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Methods": "POST, GET, OPTIONS, PUT, DELETE, HEAD",
-      },
-      body: jsonEncode(requestData),
-    );
-    if (response.statusCode == 200) {
-      print(response.body);
+    List<Map<String, dynamic>> requestDataList = selectedIndices.map((index) {
+      return {
+        'usuario': username,
+        'contraseña': password,
+        'nrocp': albums[index].nroCP,
+        'imei': imei,
+        'numero': nroCel,
+        'dispositivo': dispositivo,
+        'situacion': albums[index].idSit,
+        'idfl': albums[index].idFl,
+      };
+    }).toList();
+    for (var requestData in requestDataList) {
+      final response = await http.post(
+        Uri.parse(
+          'http://net.entreganet.com/RestServiceImpl.svc/Hablados',
+        ),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Methods":
+              "POST, GET, OPTIONS, PUT, DELETE, HEAD",
+        },
+        body: jsonEncode(requestData),
+      );
+      if (response.statusCode == 200) {
+        print(response.body);
 
-      // Navegar a /home
-      Navigator.pushNamed(context, "/home");
+        // Navegar a /home
+        Navigator.pushNamed(context, "/home");
 
-      // Esperar unos segundos (opcional)
-      await Future.delayed(const Duration(milliseconds: 300));
+        // Esperar unos segundos (opcional)
+        await Future.delayed(const Duration(milliseconds: 300));
 
-      // Navegar a /alert
-      Navigator.pushNamed(context, "/alert");
-    } else {
-      throw Exception('Failed to send llamada');
+        // Navegar a /alert
+        Navigator.pushNamed(context, "/alert");
+      } else {
+        throw Exception('Failed to send llamada');
+      }
     }
   } else {
     print("Perfil incompleto!");
