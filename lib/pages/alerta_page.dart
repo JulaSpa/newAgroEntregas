@@ -271,7 +271,6 @@ class _AlertState extends State<Alert> {
                                   bool isChecked =
                                       selectedIndices.contains(index);
 
-                                  // Actualizar la lista de selectedIndices cuando se toca el Checkbox
                                   void onCheckboxTapped(int index) {
                                     setState(() {
                                       if (selectedIndices.contains(index)) {
@@ -356,16 +355,20 @@ class _AlertState extends State<Alert> {
                                                     onCheckboxTapped(index);
                                                     print("selected indices");
                                                     print(selectedIndices);
-                                                    _showOptionsModal(
-                                                        context,
-                                                        album.idFl,
-                                                        album.nroCP,
-                                                        album.idSit,
-                                                        rech,
-                                                        allIndicesAreRCZO,
-                                                        allIndicesAreDEMO,
-                                                        selectedIndices,
-                                                        albums);
+                                                    if (selectedIndices
+                                                        .contains(index)) {
+                                                      _showOptionsModal(
+                                                          context,
+                                                          album.idFl,
+                                                          album.nroCP,
+                                                          album.idSit,
+                                                          rech,
+                                                          allIndicesAreRCZO,
+                                                          allIndicesAreDEMO,
+                                                          selectedIndices,
+                                                          albums);
+                                                    }
+                                                    ;
                                                   },
                                                 ),
                                               ),
@@ -837,114 +840,115 @@ void _showOptionsModal(
   print(uid);
 
   showModalBottomSheet(
-    context: context,
-    builder: (BuildContext context) {
-      return Container(
-        height: 100,
-        color: const Color.fromARGB(255, 17, 34, 71),
-        child: Center(
-          child: Column(
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment
-                    .spaceEvenly, // Distribuye uniformemente los elementos
-                children: [
-                  if (allIndicesAreRCZO != null && allIndicesAreRCZO)
-                    // RECHAZO CGT O AUTORIZAR O NULL
-                    Expanded(
-                      child: Column(
-                        children: [
-                          IconButton(
-                            onPressed: () {
-                              // Acción para la opción api rechazo cgt
-                              _rechazo(context, uid, nroCP, idSit,
-                                  selectedIndices, albums);
-                            },
-                            icon: const Icon(
-                              Icons.cancel,
+      context: context,
+      builder: (BuildContext context) {
+        return Container(
+          height: 100,
+          color: Color.fromARGB(255, 17, 34, 71),
+          child: Center(
+            child: Column(
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment
+                      .spaceEvenly, // Distribuye uniformemente los elementos
+                  children: [
+                    if (allIndicesAreRCZO != null && allIndicesAreRCZO)
+                      // RECHAZO CGT O AUTORIZAR O NULL
+                      Expanded(
+                        child: Column(
+                          children: [
+                            IconButton(
+                              onPressed: () {
+                                // Acción para la opción api rechazo cgt
+                                _rechazo(context, uid, nroCP, idSit,
+                                    selectedIndices, albums);
+                              },
+                              icon: const Icon(
+                                Icons.cancel,
+                                color: Colors.white,
+                              ),
                               color: Colors.white,
                             ),
-                            color: Colors.white,
-                          ),
-                          const Text(
-                            "Pedir rechazo de CGT",
-                            style: TextStyle(fontSize: 10, color: Colors.white),
-                          ),
-                        ],
+                            const Text(
+                              "Pedir rechazo de CGT",
+                              style:
+                                  TextStyle(fontSize: 10, color: Colors.white),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                  if (allIndicesAreDEMO != null && allIndicesAreDEMO)
+                    if (allIndicesAreDEMO != null && allIndicesAreDEMO)
+                      Expanded(
+                        child: Column(
+                          children: [
+                            IconButton(
+                              onPressed: () {
+                                // Acción para la opción api rechazo cgt
+                                _autorizado(context, uid, nroCP, idSit,
+                                    selectedIndices, albums);
+                                ;
+                              },
+                              icon: const Icon(
+                                Icons.check,
+                                color: Colors.white,
+                              ),
+                              color: Colors.white,
+                            ),
+                            const Text(
+                              "Autorizar",
+                              style:
+                                  TextStyle(fontSize: 10, color: Colors.white),
+                            ),
+                          ],
+                        ),
+                      ),
+
+                    // LLAMADA
                     Expanded(
                       child: Column(
                         children: [
                           IconButton(
                             onPressed: () {
-                              // Acción para la opción api rechazo cgt
-                              _autorizado(context, uid, nroCP, idSit,
-                                  selectedIndices, albums);
-                              ;
+                              _llamada(context, uid, nroCP);
+                              // Acción para la opción 1
                             },
-                            icon: const Icon(
-                              Icons.check,
-                              color: Colors.white,
-                            ),
+                            icon: const Icon(Icons.phone),
                             color: Colors.white,
                           ),
                           const Text(
-                            "Autorizar",
+                            "Solicitar llamada",
                             style: TextStyle(fontSize: 10, color: Colors.white),
                           ),
                         ],
                       ),
                     ),
 
-                  // LLAMADA
-                  Expanded(
-                    child: Column(
-                      children: [
-                        IconButton(
-                          onPressed: () {
-                            _llamada(context, uid, nroCP);
-                            // Acción para la opción 1
-                          },
-                          icon: const Icon(Icons.phone),
-                          color: Colors.white,
-                        ),
-                        const Text(
-                          "Solicitar llamada",
-                          style: TextStyle(fontSize: 10, color: Colors.white),
-                        ),
-                      ],
+                    // LEIDO
+                    Expanded(
+                      child: Column(
+                        children: [
+                          IconButton(
+                            onPressed: () async {
+                              await _leido(context, uid, nroCP, idSit,
+                                  selectedIndices, albums);
+                            },
+                            icon: const Icon(Icons.visibility),
+                            color: Colors.white,
+                          ),
+                          const Text(
+                            "Leido",
+                            style: TextStyle(fontSize: 10, color: Colors.white),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-
-                  // LEIDO
-                  Expanded(
-                    child: Column(
-                      children: [
-                        IconButton(
-                          onPressed: () async {
-                            await _leido(context, uid, nroCP, idSit,
-                                selectedIndices, albums);
-                          },
-                          icon: const Icon(Icons.visibility),
-                          color: Colors.white,
-                        ),
-                        const Text(
-                          "Leido",
-                          style: TextStyle(fontSize: 10, color: Colors.white),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ],
+                  ],
+                ),
+              ],
+            ),
           ),
-        ),
-      );
-    },
-  );
+        );
+      });
 }
 
 //API LLAMADA
