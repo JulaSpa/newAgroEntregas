@@ -35,8 +35,7 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     super.initState();
-    contarAlertas();
-    contarPosicion();
+    _initializeData();
     _getStoredUserData();
 
     // Escucha para obtener la última notificación
@@ -81,6 +80,13 @@ class _MyHomePageState extends State<MyHomePage> {
     print(lastMessage?.length);
     print("LASTM");
     print(lastm);
+  }
+
+  void _initializeData() async {
+    await Future.wait<List<dynamic>>([
+      contarAlertas(),
+      contarPosicion(),
+    ]);
   }
 
   Future<void> _getStoredUserData() async {
@@ -164,7 +170,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 //contar alertas
 
-  void contarAlertas() async {
+  Future<List<dynamic>> contarAlertas() async {
     final prefs = await SharedPreferences.getInstance();
     final req = {
       'usuario': prefs.getString('username'),
@@ -195,10 +201,11 @@ class _MyHomePageState extends State<MyHomePage> {
     setState(() {
       this.alertas = alertas;
     });
+    return alertas;
   }
 //contar posicion
 
-  void contarPosicion() async {
+  Future<List<dynamic>> contarPosicion() async {
     final prefs = await SharedPreferences.getInstance();
     final req = {
       'usuario': prefs.getString('username'),
@@ -229,6 +236,7 @@ class _MyHomePageState extends State<MyHomePage> {
     setState(() {
       this.posicion = posicion;
     });
+    return posicion;
   }
 
 //WHATS APP

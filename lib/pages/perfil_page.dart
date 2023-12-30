@@ -234,7 +234,7 @@ class _PerfilState extends State<Perfil> {
                   await prefs.setString("uuid", uuid);
                   await prefs.setBool('alertC', alertC);
                   await prefs.setBool('msjC', msjC);
-
+                  username = '#$username';
                   /* print(prefs.getString("username")); */
                   final requestData = {
                     'usuario': username,
@@ -264,6 +264,8 @@ class _PerfilState extends State<Perfil> {
                   } else {
                     throw Exception('Cant send data to firebase');
                   }
+                  /* print(requestData); */
+
                   Navigator.pushNamed(context, "/home");
                 },
                 child: const Text("Guardar"),
