@@ -258,9 +258,7 @@ class _PerfilState extends State<Perfil> {
                   );
                   if (response.statusCode == 200) {
                     print("INFO GUARDADA");
-                    /* print(response.body);
-                    print(msjC);
-                    print(requestData); */
+                    print(requestData);
                   } else {
                     throw Exception('Cant send data to firebase');
                   }

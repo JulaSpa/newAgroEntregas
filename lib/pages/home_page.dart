@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:platform_device_id_v3/platform_device_id.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({
@@ -17,9 +18,12 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  bool?
+      _dataSent; // Variable para realizar un seguimiento de si los datos ya se han enviado
   String? username;
   String? password;
   String? tok;
+  String? deviceId;
   bool? alertC;
   bool? msjC;
   bool? logI;
@@ -37,7 +41,7 @@ class _MyHomePageState extends State<MyHomePage> {
     super.initState();
     _initializeData();
     _getStoredUserData();
-
+    _getDeviceId();
     // Escucha para obtener la última notificación
 
     WidgetsFlutterBinding.ensureInitialized();
@@ -91,16 +95,24 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Future<void> _getStoredUserData() async {
     final prefs = await SharedPreferences.getInstance();
+    final storedUsername = prefs.getString('username');
+    final storedPassword = prefs.getString('password');
+    final storedTok = prefs.getString("tok");
+    final storedAlertC = prefs.getBool("alertC") ?? false;
+    final storedMsjC = prefs.getBool("msjC") ?? false;
+    final storedLogI = prefs.getBool("logInOut");
+    final storedTitle = prefs.getStringList("m");
+    final dataSentValue = prefs.getBool('_dataSent') ?? false;
     setState(() {
-      username = prefs.getString('username');
-      password = prefs.getString('password');
-      tok = prefs.getString("tok");
-      alertC = prefs.getBool("alertC");
-      msjC = prefs.getBool("msjC") ?? false;
-      logI = prefs.getBool("logInOut");
-      title = prefs.getStringList("m");
+      username = storedUsername;
+      password = storedPassword;
+      tok = storedTok;
+      alertC = storedAlertC;
+      msjC = storedMsjC;
+      logI = storedLogI;
+      title = storedTitle;
+      _dataSent = dataSentValue;
     });
-    _loadAlbumData();
 
     /* print(username);
     print(tok);
@@ -108,6 +120,17 @@ class _MyHomePageState extends State<MyHomePage> {
     print(msjC); */
     print("LOGINOUT");
     print(logI);
+    // Verifica si los datos aún no se han enviado antes de cargarlos
+  }
+
+  Future<void> _getDeviceId() async {
+    try {
+      deviceId = await PlatformDeviceId.getDeviceId;
+      _loadAlbumData();
+    } catch (e) {
+      print("Error al obtener el identificador del dispositivo: $e");
+      deviceId = null;
+    }
   }
 
   void _loadAlbumData() async {
@@ -117,7 +140,7 @@ class _MyHomePageState extends State<MyHomePage> {
       "token": tok,
       "alertas": alertC,
       "mensajes": msjC,
-      "uuid": "1234"
+      "uuid": deviceId
     };
     //VALIDA USUARIO Y CONTRASEÑA
     final req = {
@@ -150,22 +173,36 @@ class _MyHomePageState extends State<MyHomePage> {
     });
 
     //ENVIA DATOS A LA API
-    final response = await http.post(
-      Uri.parse(
-        'http://net.entreganet.com/RestServiceImpl.svc/Firebase',
-      ),
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Methods": "POST, GET, OPTIONS, PUT, DELETE, HEAD",
-      },
-      body: jsonEncode(requestData),
-    );
-    if (response.statusCode == 200) {
-      print("TOKO OK");
-      print(msjC);
+    if (_dataSent == false) {
+      final response = await http.post(
+        Uri.parse(
+          'http://net.entreganet.com/RestServiceImpl.svc/Firebase',
+        ),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Methods":
+              "POST, GET, OPTIONS, PUT, DELETE, HEAD",
+        },
+        body: jsonEncode(requestData),
+      );
+      if (response.statusCode == 200) {
+        print("TOKO OK");
+        print(msjC);
+        print("home firebase");
+        print(requestData);
+
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setBool('_dataSent', true);
+        print("data sent");
+        print(_dataSent);
+      } else {
+        throw Exception('Cant send data to firebase');
+      }
     } else {
-      throw Exception('Cant send data to firebase');
+      print("Los datos ya se han enviado a /firebase 1 vez");
+      print("data sent");
+      print(_dataSent);
     }
   }
 //contar alertas
