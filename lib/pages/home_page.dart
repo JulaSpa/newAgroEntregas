@@ -59,22 +59,6 @@ class _MyHomePageState extends State<MyHomePage> {
           lastMessage = messages;
         });
       });
-
-      /* if (lastMessage != null && lastMessage!.isNotEmpty) {
-        // Recupera la lista actual de títulos de SharedPreferences
-        final prefs = await SharedPreferences.getInstance();
-        List storedTitles = prefs.getStringList("m") ?? [];
-
-        // Agrega los nuevos títulos a la lista
-        for (var mensaje in lastMessage!) {
-          storedTitles.add(mensaje.title);
-        }
-
-        // Guarda la lista actualizada en SharedPreferences
-        for (var msjs in storedTitles) {
-          await prefs.setStringList("m", msjs);
-        }
-      } */
     }).catchError((error) {
       print("Error al inicializar Firebase: $error");
     });

@@ -21,7 +21,7 @@ class PushNotProv {
   initNotifications() {
     messaging.requestPermission();
     messaging.getToken().then((token) async {
-      print("TOKEN:");
+      print("TOKEN en providers:");
       print(token);
       final String tok = token!;
 

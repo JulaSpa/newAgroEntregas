@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter/gestures.dart';
+import 'package:flutter_application_1/src/providers.dart';
+import 'package:firebase_core/firebase_core.dart';
 
 class Login extends StatefulWidget {
   const Login({
@@ -15,19 +17,33 @@ class Login extends StatefulWidget {
 class _LoginState extends State<Login> {
   var myController = TextEditingController();
   var pass = TextEditingController();
-
-  //Log
   bool logInOut = false;
 
   //recordar usuario y contraseña
   bool isChecked = false;
   //aceptar términos y condiciones
   bool readCheck = true;
+
+  late PushNotProv pushNotProv;
+  bool firebaseInitialized = false;
   @override
   void initState() {
     super.initState();
     // Obtener los valores de SharedPreferences
     _getStoredUserData();
+    WidgetsFlutterBinding.ensureInitialized();
+    // Inicializa Firebase de manera asíncrona y espera a que esté listo
+    Firebase.initializeApp().then((_) async {
+      // La inicialización de Firebase se ha completado
+      pushNotProv = PushNotProv();
+      // ENVIA TOKEN A FIREBASE
+      pushNotProv.initNotifications(); // Utiliza la instancia existente
+      setState(() {
+        firebaseInitialized = true; // Marca que Firebase se ha inicializado
+      });
+    }).catchError((error) {
+      print("Error al inicializar Firebase: $error");
+    });
   }
 
   Future<void> _getStoredUserData() async {
@@ -43,7 +59,6 @@ class _LoginState extends State<Login> {
         pass.text = "";
       }
     });
-
     /* print(prefs.getString("nombreC")); */
   }
 
@@ -203,8 +218,8 @@ class _LoginState extends State<Login> {
                           final prefs = await SharedPreferences.getInstance();
                           await prefs.setString('username', username);
                           await prefs.setString('password', password);
-// Cambiar el valor de logInOut a true y guardarlo en SharedPreferences
                           await prefs.setBool('logInOut', true);
+
                           Navigator.pushNamed(
                             context,
                             "/home",

@@ -234,7 +234,7 @@ class _PerfilState extends State<Perfil> {
                   await prefs.setString("uuid", uuid);
                   await prefs.setBool('alertC', alertC);
                   await prefs.setBool('msjC', msjC);
-                  username = '#$username';
+                  username = '$username';
                   /* print(prefs.getString("username")); */
                   final requestData = {
                     'usuario': username,
