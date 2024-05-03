@@ -18,6 +18,27 @@ class PushNotProv {
       StreamController<List<MensajesArguments>>.broadcast();
   Stream<List<MensajesArguments>> get mensajes => _mensajeStreamControll.stream;
 
+  PushNotProv() {
+    _loadStoredMessages(); // Cargar mensajes almacenados al iniciar
+  }
+
+  Future<void> _loadStoredMessages() async {
+    final prefs = await SharedPreferences.getInstance();
+    final storedTitles = prefs.getStringList('m') ?? [];
+    final storedBodies = prefs.getStringList('mb') ?? [];
+    // Crear mensajes a partir de los datos almacenados
+    mensajesList = storedTitles
+        .asMap()
+        .entries
+        .map((entry) => MensajesArguments(
+              title: [entry.value],
+              body: [storedBodies[entry.key]],
+            ))
+        .toList();
+    // Agregar los mensajes cargados al stream
+    _mensajeStreamControll.add(mensajesList);
+  }
+
   initNotifications() {
     messaging.requestPermission();
     messaging.getToken().then((token) async {
@@ -106,6 +127,17 @@ class PushNotProv {
 
       // Añade el mensaje al stream
       _mensajeStreamControll.add(mensajesList);
+      List<String> accumulatedTitles = [];
+      List<String> accumulatedBodies = [];
+      for (var e in mensajesList) {
+        accumulatedTitles.addAll(e.title);
+        accumulatedBodies.addAll(e.body);
+      }
+
+      // Actualiza SharedPreferences con los nuevos títulos y cuerpos acumulados
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setStringList('m', accumulatedTitles);
+      await prefs.setStringList('mb', accumulatedBodies);
     }
   }
 

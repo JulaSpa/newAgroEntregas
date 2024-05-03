@@ -21,7 +21,6 @@ void main() async {
   bool? logI = prefs.getBool('logInOut');
   await Firebase.initializeApp();
   runApp(MyApp(logI: logI));
-  /*  runApp(const MyApp()); */
 }
 
 class MyApp extends StatelessWidget {

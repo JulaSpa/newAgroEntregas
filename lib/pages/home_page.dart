@@ -42,6 +42,7 @@ class _MyHomePageState extends State<MyHomePage> {
     _initializeData();
     _getStoredUserData();
     _getDeviceId();
+
     // Escucha para obtener la última notificación
 
     WidgetsFlutterBinding.ensureInitialized();
