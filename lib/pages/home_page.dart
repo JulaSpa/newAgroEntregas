@@ -7,6 +7,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:platform_device_id_v3/platform_device_id.dart';
+/* import 'package:universal_io/io.dart' as uio; */
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({
@@ -44,7 +45,7 @@ class _MyHomePageState extends State<MyHomePage> {
     _getDeviceId();
 
     // Escucha para obtener la última notificación
-
+    /* if (uio.Platform.isAndroid || uio.Platform.isIOS) { */
     WidgetsFlutterBinding.ensureInitialized();
     // Inicializa Firebase de manera asíncrona y espera a que esté listo
     Firebase.initializeApp().then((_) async {
@@ -64,7 +65,7 @@ class _MyHomePageState extends State<MyHomePage> {
       print("Error al inicializar Firebase: $error");
     });
     // Espera a que Firebase se haya inicializado antes de usar pushNotProv
-
+    /* } */
     print("last message");
     print(lastMessage?.length);
     print("LASTM");

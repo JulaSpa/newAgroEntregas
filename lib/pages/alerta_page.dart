@@ -1002,7 +1002,20 @@ void _showOptionsModal(
 
 //COMPARTIR
 Future<void> _compartir(context, List? compartirLista) async {
-  final String textoCompartir = compartirLista!.join('\n');
+  if (compartirLista == null || compartirLista.isEmpty) {
+    return;
+  }
+
+  final StringBuffer buffer = StringBuffer();
+
+  for (var item in compartirLista) {
+    item.forEach((key, value) {
+      buffer.writeln('$key: $value');
+    });
+    buffer.writeln(); // Agrega una línea en blanco entre elementos
+  }
+
+  final String textoCompartir = buffer.toString();
 
   try {
     await Share.share(textoCompartir);
