@@ -353,8 +353,36 @@ class _AlertState extends State<Alert> {
                                                   value: isChecked,
                                                   onChanged: (bool? value) {
                                                     onCheckboxTapped(index);
-                                                    print("selected indices");
-                                                    print(selectedIndices);
+
+                                                    List<Map<String, dynamic>>
+                                                        CompartirLista =
+                                                        selectedIndices
+                                                            .map((index) {
+                                                      return {
+                                                        'Estado':
+                                                            albums[index].idSit,
+                                                        'Titular': albums[index]
+                                                            .xtitular,
+                                                        'Observaciones': albums[
+                                                                index]
+                                                            .observacionesana,
+                                                        'Procedencia':
+                                                            albums[index]
+                                                                .nombrePrc,
+                                                        'Número carta de porte':
+                                                            albums[index].nroCP,
+                                                        'Corredor':
+                                                            albums[index]
+                                                                .xcorredor,
+                                                        'Mercaderia':
+                                                            albums[index]
+                                                                .nombreMe,
+                                                        'Destino': albums[index]
+                                                            .xdestino,
+                                                        'Patente': albums[index]
+                                                            .chasisFl,
+                                                      };
+                                                    }).toList();
                                                     if (selectedIndices
                                                         .contains(index)) {
                                                       _showOptionsModal(
@@ -366,7 +394,8 @@ class _AlertState extends State<Alert> {
                                                           allIndicesAreRCZO,
                                                           allIndicesAreDEMO,
                                                           selectedIndices,
-                                                          albums);
+                                                          albums,
+                                                          CompartirLista);
                                                     }
                                                     ;
                                                   },
@@ -836,7 +865,8 @@ void _showOptionsModal(
     bool? allIndicesAreRCZO,
     bool? allIndicesAreDEMO,
     List<int> selectedIndices,
-    List albums) {
+    List albums,
+    List compartirLista) {
   print(uid);
 
   showModalBottomSheet(
@@ -942,6 +972,25 @@ void _showOptionsModal(
                         ],
                       ),
                     ),
+
+                    //Compartir
+                    Expanded(
+                      child: Column(
+                        children: [
+                          IconButton(
+                            onPressed: () async {
+                              await _compartir(context, compartirLista);
+                            },
+                            icon: const Icon(Icons.share_outlined),
+                            color: Colors.white,
+                          ),
+                          const Text(
+                            "Compartir",
+                            style: TextStyle(fontSize: 10, color: Colors.white),
+                          ),
+                        ],
+                      ),
+                    ),
                   ],
                 ),
               ],
@@ -949,6 +998,21 @@ void _showOptionsModal(
           ),
         );
       });
+}
+
+//COMPARTIR
+Future<void> _compartir(context, List? compartirLista) async {
+  final String textoCompartir = compartirLista!.join('\n');
+
+  try {
+    await Share.share(textoCompartir);
+  } catch (e) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Error al compartir: $e'),
+      ),
+    );
+  }
 }
 
 //API LLAMADA
