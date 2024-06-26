@@ -7,7 +7,8 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:platform_device_id_v3/platform_device_id.dart';
-/* import 'package:universal_io/io.dart' as uio; */
+import 'package:universal_io/io.dart' as uio;
+import 'package:auto_size_text/auto_size_text.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({
@@ -45,27 +46,27 @@ class _MyHomePageState extends State<MyHomePage> {
     _getDeviceId();
 
     // Escucha para obtener la última notificación
-    /* if (uio.Platform.isAndroid || uio.Platform.isIOS) { */
-    WidgetsFlutterBinding.ensureInitialized();
-    // Inicializa Firebase de manera asíncrona y espera a que esté listo
-    Firebase.initializeApp().then((_) async {
-      // La inicialización de Firebase se ha completado
-      pushNotProv = PushNotProv();
-      // ENVIA TOKEN A FIREBASE
-      pushNotProv.initNotifications(); // Utiliza la instancia existente
-      setState(() {
-        firebaseInitialized = true; // Marca que Firebase se ha inicializado
-      });
-      pushNotProv.mensajes.listen((List<MensajesArguments> messages) async {
+    if (uio.Platform.isAndroid || uio.Platform.isIOS) {
+      WidgetsFlutterBinding.ensureInitialized();
+      // Inicializa Firebase de manera asíncrona y espera a que esté listo
+      Firebase.initializeApp().then((_) async {
+        // La inicialización de Firebase se ha completado
+        pushNotProv = PushNotProv();
+        // ENVIA TOKEN A FIREBASE
+        pushNotProv.initNotifications(); // Utiliza la instancia existente
         setState(() {
-          lastMessage = messages;
+          firebaseInitialized = true; // Marca que Firebase se ha inicializado
         });
+        pushNotProv.mensajes.listen((List<MensajesArguments> messages) async {
+          setState(() {
+            lastMessage = messages;
+          });
+        });
+      }).catchError((error) {
+        print("Error al inicializar Firebase: $error");
       });
-    }).catchError((error) {
-      print("Error al inicializar Firebase: $error");
-    });
-    // Espera a que Firebase se haya inicializado antes de usar pushNotProv
-    /* } */
+      // Espera a que Firebase se haya inicializado antes de usar pushNotProv
+    }
     print("last message");
     print(lastMessage?.length);
     print("LASTM");
@@ -135,7 +136,7 @@ class _MyHomePageState extends State<MyHomePage> {
     };
     final res = await http.post(
       Uri.parse(
-        'http://net.entreganet.com/RestServiceImpl.svc/Login',
+        'https://net.agroentregas.com.ar/RestServiceImpl.svc/Login',
       ),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
@@ -162,7 +163,7 @@ class _MyHomePageState extends State<MyHomePage> {
     if (_dataSent == false) {
       final response = await http.post(
         Uri.parse(
-          'http://net.entreganet.com/RestServiceImpl.svc/Firebase',
+          'https://net.agroentregas.com.ar/RestServiceImpl.svc/Firebase',
         ),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
@@ -201,7 +202,7 @@ class _MyHomePageState extends State<MyHomePage> {
     };
     final contadorAlertas = await http.post(
       Uri.parse(
-        'http://net.entreganet.com/RestServiceImpl.svc/Alertas',
+        'https://net.agroentregas.com.ar/RestServiceImpl.svc/Alertas',
       ),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
@@ -236,7 +237,7 @@ class _MyHomePageState extends State<MyHomePage> {
     };
     final contadorPos = await http.post(
       Uri.parse(
-        'http://net.entreganet.com/RestServiceImpl.svc/Posicion',
+        'https://net.agroentregas.com.ar/RestServiceImpl.svc/Posicion',
       ),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
@@ -422,27 +423,25 @@ class _MyHomePageState extends State<MyHomePage> {
                               color: Colors.white,
                               size: 30,
                             ),
-                            Positioned(
-                              right: 0,
-                              child: Container(
-                                padding: const EdgeInsets.all(2),
-                                decoration: const BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: Colors
-                                      .red, // Cambia el color según tus preferencias
-                                ),
-                                child: Builder(
-                                  builder: (BuildContext context) {
-                                    final alertasLength = alertas?.length ?? 0;
-                                    return Text(
-                                      alertasLength.toString(),
-                                      style: const TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 12,
-                                      ),
-                                    );
-                                  },
-                                ),
+                            Container(
+                              padding: const EdgeInsets.all(3),
+                              margin: const EdgeInsets.only(left: 15, top: 14),
+                              decoration: BoxDecoration(
+                                color: Colors.red,
+                                borderRadius: BorderRadius.circular(
+                                    18), // Ajusta el radio según sea necesario
+                              ),
+                              child: Builder(
+                                builder: (BuildContext context) {
+                                  final alertasLength = alertas?.length ?? 0;
+                                  return AutoSizeText(
+                                    alertasLength.toString(),
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 12,
+                                    ),
+                                  );
+                                },
                               ),
                             ),
                           ],
@@ -485,28 +484,25 @@ class _MyHomePageState extends State<MyHomePage> {
                               color: Colors.white,
                               size: 30,
                             ),
-                            Positioned(
-                              right: 0,
-                              child: Container(
-                                padding: const EdgeInsets.all(2),
-                                decoration: const BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: Colors
-                                      .red, // Cambia el color según tus preferencias
-                                ),
-                                child: Builder(
-                                  builder: (BuildContext context) {
-                                    final posicionLength =
-                                        posicion?.length ?? 0;
-                                    return Text(
-                                      posicionLength.toString(),
-                                      style: const TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 12,
-                                      ),
-                                    );
-                                  },
-                                ),
+                            Container(
+                              padding: const EdgeInsets.all(3),
+                              margin: const EdgeInsets.only(left: 15, top: 14),
+                              decoration: BoxDecoration(
+                                color: Colors.red,
+                                borderRadius: BorderRadius.circular(
+                                    18), // Ajusta el radio según sea necesario
+                              ),
+                              child: Builder(
+                                builder: (BuildContext context) {
+                                  final posicionLength = posicion?.length ?? 0;
+                                  return AutoSizeText(
+                                    posicionLength.toString(),
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 12,
+                                    ),
+                                  );
+                                },
                               ),
                             ),
                           ],

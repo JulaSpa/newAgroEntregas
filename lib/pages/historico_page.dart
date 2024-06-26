@@ -19,14 +19,7 @@ class Historic extends StatefulWidget {
 class _HistoricState extends State<Historic> {
   DateTime? _selectedFromDate;
   DateTime? _selectedToDate;
-  /* Future<void> _saveSelectedDates() async {
-    final prefs = await SharedPreferences.getInstance();
-    if (_selectedFromDate != null && _selectedToDate != null) {
-      await prefs.setString('fromDate', _selectedFromDate!.toIso8601String());
-      await prefs.setString('toDate', _selectedToDate!.toIso8601String());
-    }
-  } */
-
+  var nroCP = TextEditingController();
   @override
   Widget build(BuildContext context) {
     return Stack(
@@ -169,6 +162,29 @@ class _HistoricState extends State<Historic> {
                       ),
                     ),
                   ),
+                  Container(
+                    constraints: const BoxConstraints(maxWidth: 1000),
+                    padding: const EdgeInsets.symmetric(vertical: 80),
+                    child: FractionallySizedBox(
+                      widthFactor: 0.7,
+                      child: TextField(
+                        style: const TextStyle(color: Colors.white),
+
+                        decoration: const InputDecoration(
+                          enabledBorder: UnderlineInputBorder(
+                              borderSide: BorderSide(
+                                  color: Color.fromARGB(255, 255, 255, 255))),
+                          labelText: "Número CP",
+                          labelStyle: TextStyle(
+                              color: Color.fromARGB(255, 252, 250, 250),
+                              fontSize: 15),
+                          contentPadding: EdgeInsets.only(left: 20),
+                        ),
+                        //CONTROLADOR CP
+                        controller: nroCP,
+                      ),
+                    ),
+                  ),
                   //BUSCAR
 
                   Container(
@@ -185,6 +201,8 @@ class _HistoricState extends State<Historic> {
                           title: const Icon(Icons.search),
                           onTap: () async {
                             final prefs = await SharedPreferences.getInstance();
+                            final String cpBuscarPage = nroCP.text;
+                            await prefs.setString('cpBuscarPage', cpBuscarPage);
                             if (_selectedFromDate != null &&
                                 _selectedToDate != null) {
                               await prefs.setString('fromDate',

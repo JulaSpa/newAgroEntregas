@@ -4,7 +4,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter_application_1/src/providers.dart';
 import 'package:firebase_core/firebase_core.dart';
-/* import 'package:universal_io/io.dart' as uio; */
+import 'package:universal_io/io.dart' as uio;
 
 class Login extends StatefulWidget {
   const Login({
@@ -32,21 +32,21 @@ class _LoginState extends State<Login> {
     super.initState();
     // Obtener los valores de SharedPreferences
     _getStoredUserData();
-    /* if (uio.Platform.isAndroid || uio.Platform.isIOS) { */
-    WidgetsFlutterBinding.ensureInitialized();
-    // Inicializa Firebase de manera asíncrona y espera a que esté listo
-    Firebase.initializeApp().then((_) async {
-      // La inicialización de Firebase se ha completado
-      pushNotProv = PushNotProv();
-      // ENVIA TOKEN A FIREBASE
-      pushNotProv.initNotifications(); // Utiliza la instancia existente
-      setState(() {
-        firebaseInitialized = true; // Marca que Firebase se ha inicializado
+    if (uio.Platform.isAndroid || uio.Platform.isIOS) {
+      WidgetsFlutterBinding.ensureInitialized();
+      // Inicializa Firebase de manera asíncrona y espera a que esté listo
+      Firebase.initializeApp().then((_) async {
+        // La inicialización de Firebase se ha completado
+        pushNotProv = PushNotProv();
+        // ENVIA TOKEN A FIREBASE
+        pushNotProv.initNotifications(); // Utiliza la instancia existente
+        setState(() {
+          firebaseInitialized = true; // Marca que Firebase se ha inicializado
+        });
+      }).catchError((error) {
+        print("Error al inicializar Firebase: $error");
       });
-    }).catchError((error) {
-      print("Error al inicializar Firebase: $error");
-    });
-    /*  } */
+    }
   }
 
   Future<void> _getStoredUserData() async {

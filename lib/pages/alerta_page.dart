@@ -70,7 +70,7 @@ class _AlertState extends State<Alert> {
     };
     final response = await http.post(
       Uri.parse(
-        'http://net.entreganet.com/RestServiceImpl.svc/Alertas',
+        'https://net.agroentregas.com.ar/RestServiceImpl.svc/Alertas',
       ),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
@@ -760,7 +760,7 @@ void _downLoad(
   /* print(requestData); */
 
   final response = await http.post(
-    Uri.parse('http://net.entreganet.com/RestServiceImpl.svc/Imagen'),
+    Uri.parse('https://net.agroentregas.com.ar/RestServiceImpl.svc/Imagen'),
     headers: <String, String>{
       'Content-Type': 'application/json; charset=UTF-8',
     },
@@ -1067,7 +1067,7 @@ Future<void> _llamada(context, String? uid, String? nroCP) async {
       telC != null) {
     final response = await http.post(
       Uri.parse(
-        'http://net.entreganet.com/RestServiceImpl.svc/Llamada',
+        'https://net.agroentregas.com.ar/RestServiceImpl.svc/Llamada',
       ),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
@@ -1157,7 +1157,7 @@ Future<void> _rechazo(context, String? uid, String? nroCP, String? idSit,
     for (var requestData in requestDataList) {
       final response = await http.post(
         Uri.parse(
-          'http://net.entreganet.com/RestServiceImpl.svc/Rechazos',
+          'https://net.agroentregas.com.ar/RestServiceImpl.svc/Rechazos',
         ),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
@@ -1230,7 +1230,7 @@ Future<void> _autorizado(context, String? uid, String? nroCP, String? idSit,
     for (var requestData in requestDataList) {
       final response = await http.post(
         Uri.parse(
-          'http://net.entreganet.com/RestServiceImpl.svc/Autorizado',
+          'https://net.agroentregas.com.ar/RestServiceImpl.svc/Autorizado',
         ),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
@@ -1304,7 +1304,7 @@ Future<void> _leido(context, String? uid, String? nroCP, String? idSit,
     for (var requestData in requestDataList) {
       final response = await http.post(
         Uri.parse(
-          'http://net.entreganet.com/RestServiceImpl.svc/Hablados',
+          'https://net.agroentregas.com.ar/RestServiceImpl.svc/Hablados',
         ),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',

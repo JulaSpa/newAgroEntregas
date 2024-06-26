@@ -23,6 +23,7 @@ class _BuscarState extends State<Buscar> {
   String? password;
   String? fromDate;
   String? toDate;
+  String? nroCp;
   Future<List<Album>> futureAlbum = Future.value([]);
   bool isLoading = true;
 //BUSCAR POR PALABRA CLAVE
@@ -41,6 +42,7 @@ class _BuscarState extends State<Buscar> {
     setState(() {
       username = prefs.getString('username');
       password = prefs.getString('password');
+      nroCp = prefs.getString("cpBuscarPage");
       fromDate = prefs.getString('fromDate');
       toDate = prefs.getString('toDate');
     });
@@ -71,12 +73,14 @@ class _BuscarState extends State<Buscar> {
     final requestData = {
       'usuario': username,
       'contraseña': password,
+      "nrocp": nroCp,
       'fechad': fromDate,
       'fechah': toDate,
     };
 
     final response = await http.post(
-      Uri.parse('http://net.entreganet.com/RestServiceImpl.svc/Historicos'),
+      Uri.parse(
+          'https://net.agroentregas.com.ar/RestServiceImpl.svc/Historicos'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },
@@ -610,7 +614,7 @@ void _downLoad(
   /* print(requestData); */
 
   final response = await http.post(
-    Uri.parse('http://net.entreganet.com/RestServiceImpl.svc/Imagen'),
+    Uri.parse('https://net.agroentregas.com.ar/RestServiceImpl.svc/Imagen'),
     headers: <String, String>{
       'Content-Type': 'application/json; charset=UTF-8',
     },

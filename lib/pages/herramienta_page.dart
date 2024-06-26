@@ -27,7 +27,8 @@ class _ToolState extends State<Tool> {
   void fetchData() async {
     try {
       final response = await http.get(
-        Uri.parse('http://net.entreganet.com/RestServiceImpl.svc/Noticias'),
+        Uri.parse(
+            'http://net.agroentregas.com.ar/RestServiceImpl.svc/Noticias'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
           "Access-Control-Allow-Origin": "*",
@@ -36,7 +37,7 @@ class _ToolState extends State<Tool> {
         },
       );
       final resHdfs = await http.get(
-        Uri.parse('http://net.entreganet.com/RestServiceImpl.svc/Hfds'),
+        Uri.parse('http://net.agroentregas.com.ar/RestServiceImpl.svc/Hfds'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
           "Access-Control-Allow-Origin": "*",
@@ -45,7 +46,7 @@ class _ToolState extends State<Tool> {
         },
       );
       final resHyV = await http.get(
-        Uri.parse('http://net.entreganet.com/RestServiceImpl.svc/Hvc'),
+        Uri.parse('http://net.agroentregas.com.ar/RestServiceImpl.svc/Hvc'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
           "Access-Control-Allow-Origin": "*",
@@ -54,7 +55,7 @@ class _ToolState extends State<Tool> {
         },
       );
       final resCA = await http.get(
-        Uri.parse('http://net.entreganet.com/RestServiceImpl.svc/CA'),
+        Uri.parse('http://net.agroentregas.com.ar/RestServiceImpl.svc/CA'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
           "Access-Control-Allow-Origin": "*",
@@ -63,7 +64,8 @@ class _ToolState extends State<Tool> {
         },
       );
       final resCond = await http.get(
-        Uri.parse('http://net.entreganet.com/RestServiceImpl.svc/Condiciones'),
+        Uri.parse(
+            'http://net.agroentregas.com.ar/RestServiceImpl.svc/Condiciones'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
           "Access-Control-Allow-Origin": "*",
@@ -72,7 +74,8 @@ class _ToolState extends State<Tool> {
         },
       );
       final resCamiones = await http.get(
-        Uri.parse('http://net.entreganet.com/RestServiceImpl.svc/Camiones'),
+        Uri.parse(
+            'http://net.agroentregas.com.ar/RestServiceImpl.svc/Camiones'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
           "Access-Control-Allow-Origin": "*",
@@ -81,7 +84,8 @@ class _ToolState extends State<Tool> {
         },
       );
       final resRef = await http.get(
-        Uri.parse('http://net.entreganet.com/RestServiceImpl.svc/Referencias'),
+        Uri.parse(
+            'http://net.agroentregas.com.ar/RestServiceImpl.svc/Referencias'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
           "Access-Control-Allow-Origin": "*",

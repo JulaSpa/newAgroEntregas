@@ -58,7 +58,7 @@ class _Camiones extends State<Camiones> {
                       Icons.assignment,
                       color: Colors.white,
                     ),
-                    labelText: "Número de carta de porte",
+                    labelText: "Número de carta de porte o patente",
                     labelStyle: TextStyle(
                         color: Color.fromARGB(255, 252, 250, 250),
                         fontSize: 11),

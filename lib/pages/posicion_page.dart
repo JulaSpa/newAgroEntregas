@@ -67,7 +67,7 @@ class _PositionState extends State<Position> {
     };
     final response = await http.post(
       Uri.parse(
-        'http://net.entreganet.com/RestServiceImpl.svc/Posicion',
+        'https://net.agroentregas.com.ar/RestServiceImpl.svc/Posicion',
       ),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
@@ -687,7 +687,7 @@ void _downLoad(
   /* print(requestData); */
 
   final response = await http.post(
-    Uri.parse('http://net.entreganet.com/RestServiceImpl.svc/Imagen'),
+    Uri.parse('https://net.agroentregas.com.ar/RestServiceImpl.svc/Imagen'),
     headers: <String, String>{
       'Content-Type': 'application/json; charset=UTF-8',
     },

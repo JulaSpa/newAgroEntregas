@@ -14,15 +14,15 @@ import 'package:flutter_application_1/pages/camionesbusq_page.dart';
 import 'package:flutter_application_1/pages/mensajes_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:firebase_core/firebase_core.dart';
-/* import 'package:universal_io/io.dart' as uio; */
+import 'package:universal_io/io.dart' as uio;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   SharedPreferences prefs = await SharedPreferences.getInstance();
   bool? logI = prefs.getBool('logInOut');
-  /* if (uio.Platform.isAndroid || uio.Platform.isIOS) { */
-  await Firebase.initializeApp();
-  /* } */
+  if (uio.Platform.isAndroid || uio.Platform.isIOS) {
+    await Firebase.initializeApp();
+  }
   runApp(MyApp(logI: logI));
 }
 
@@ -34,7 +34,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'AgroEntregas',
       initialRoute: logI == false || logI == null ? '/inicio' : '/home',
       routes: {
         "/inicio": (context) => const Inicio(),

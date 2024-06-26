@@ -46,12 +46,10 @@ class _CamionesBusq extends State<CamionesBusq> {
   }
 
   Future<List<Album>> fetchAlbum() async {
-    final requestData = {
-      'nrocp': nroCPSrch,
-    };
+    final requestData = {'nrocp': nroCPSrch};
     final response = await http.post(
       Uri.parse(
-        'http://net.entreganet.com/RestServiceImpl.svc/CamioneroCP',
+        'https://net.agroentregas.com.ar/RestServiceImpl.svc/CamioneroCP',
       ),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
@@ -331,6 +329,40 @@ class _CamionesBusq extends State<CamionesBusq> {
                                           child: Text(
                                             album.observacionesana
                                                 .toUpperCase(),
+                                            style: const TextStyle(
+                                              fontSize: 15,
+                                              color: Colors.lightBlue,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        const Padding(
+                                          padding:
+                                              EdgeInsetsDirectional.fromSTEB(
+                                                  5, 0, 0, 0),
+                                          child: Text(
+                                            "PATENTE: ",
+                                            style: TextStyle(
+                                              fontSize: 15,
+                                              color: Colors.black,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                        ),
+                                        Expanded(
+                                          child: Text(
+                                            album.chasisFl.toUpperCase(),
                                             style: const TextStyle(
                                               fontSize: 15,
                                               color: Colors.lightBlue,
