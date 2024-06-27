@@ -20,8 +20,6 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  bool?
-      _dataSent; // Variable para realizar un seguimiento de si los datos ya se han enviado
   String? username;
   String? password;
   String? tok;
@@ -89,7 +87,7 @@ class _MyHomePageState extends State<MyHomePage> {
     final storedMsjC = prefs.getBool("msjC") ?? false;
     final storedLogI = prefs.getBool("logInOut");
     final storedTitle = prefs.getStringList("m");
-    final dataSentValue = prefs.getBool('_dataSent') ?? false;
+
     setState(() {
       username = storedUsername;
       password = storedPassword;
@@ -98,7 +96,6 @@ class _MyHomePageState extends State<MyHomePage> {
       msjC = storedMsjC;
       logI = storedLogI;
       title = storedTitle;
-      _dataSent = dataSentValue;
     });
 
     /* print(username);
@@ -121,14 +118,6 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void _loadAlbumData() async {
-    final requestData = {
-      'usuario': username,
-      'contraseña': password,
-      "token": tok,
-      "alertas": alertC,
-      "mensajes": msjC,
-      "uuid": deviceId
-    };
     //VALIDA USUARIO Y CONTRASEÑA
     final req = {
       'usuario': username,
@@ -158,39 +147,6 @@ class _MyHomePageState extends State<MyHomePage> {
       isAccesoTrue = accesoResult;
       isLoading = false;
     });
-
-    //ENVIA DATOS A LA API
-    if (_dataSent == false) {
-      final response = await http.post(
-        Uri.parse(
-          'https://net.agroentregas.com.ar/RestServiceImpl.svc/Firebase',
-        ),
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-          "Access-Control-Allow-Origin": "*",
-          "Access-Control-Allow-Methods":
-              "POST, GET, OPTIONS, PUT, DELETE, HEAD",
-        },
-        body: jsonEncode(requestData),
-      );
-      if (response.statusCode == 200) {
-        print("TOKO OK");
-        print(msjC);
-        print("home firebase");
-        print(requestData);
-
-        final prefs = await SharedPreferences.getInstance();
-        await prefs.setBool('_dataSent', true);
-        print("data sent");
-        print(_dataSent);
-      } else {
-        throw Exception('Cant send data to firebase');
-      }
-    } else {
-      print("Los datos ya se han enviado a /firebase 1 vez");
-      print("data sent");
-      print(_dataSent);
-    }
   }
 //contar alertas
 

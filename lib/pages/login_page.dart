@@ -4,7 +4,11 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter_application_1/src/providers.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart'; // Agrega este import
 import 'package:universal_io/io.dart' as uio;
+import 'package:platform_device_id_v3/platform_device_id.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class Login extends StatefulWidget {
   const Login({
@@ -19,19 +23,27 @@ class _LoginState extends State<Login> {
   var myController = TextEditingController();
   var pass = TextEditingController();
   bool logInOut = false;
-
   //recordar usuario y contraseña
   bool isChecked = false;
   //aceptar términos y condiciones
   bool readCheck = true;
-
+//Firebase
+  String? username;
+  String? password;
+  String? tok;
+  String? deviceId;
+  bool? alertC;
+  bool? msjC;
+//Inicio push
   late PushNotProv pushNotProv;
   bool firebaseInitialized = false;
+
   @override
   void initState() {
     super.initState();
     // Obtener los valores de SharedPreferences
     _getStoredUserData();
+    _getDeviceId();
     if (uio.Platform.isAndroid || uio.Platform.isIOS) {
       WidgetsFlutterBinding.ensureInitialized();
       // Inicializa Firebase de manera asíncrona y espera a que esté listo
@@ -40,8 +52,18 @@ class _LoginState extends State<Login> {
         pushNotProv = PushNotProv();
         // ENVIA TOKEN A FIREBASE
         pushNotProv.initNotifications(); // Utiliza la instancia existente
+
+        // Obtén el token de Firebase
+        FirebaseMessaging messaging = FirebaseMessaging.instance;
+        String? token = await messaging.getToken();
+
+        // Guarda el token en SharedPreferences
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString('tok', token!);
+
         setState(() {
           firebaseInitialized = true; // Marca que Firebase se ha inicializado
+          tok = token; // Asigna el token a la variable de clase
         });
       }).catchError((error) {
         print("Error al inicializar Firebase: $error");
@@ -51,18 +73,64 @@ class _LoginState extends State<Login> {
 
   Future<void> _getStoredUserData() async {
     final prefs = await SharedPreferences.getInstance();
+    final storedUsername = prefs.getString('username');
+    final storedPassword = prefs.getString('password');
+    final storedTok = prefs.getString("tok");
+    final storedAlertC = prefs.getBool("alertC") ?? false;
+    final storedMsjC = prefs.getBool("msjC") ?? false;
     setState(() {
       isChecked = prefs.getBool("rememberUserData") ?? false;
+      username = storedUsername;
+      password = storedPassword;
+      tok = storedTok; // Cargar el token almacenado
+      alertC = storedAlertC;
+      msjC = storedMsjC;
       if (isChecked) {
-        myController.text = prefs.getString("username") ??
-            ''; // Obtén el nombre, o un valor predeterminado si no se encuentra
+        myController.text = prefs.getString("username") ?? '';
         pass.text = prefs.getString("password") ?? "";
       } else {
         myController.text = "";
         pass.text = "";
       }
     });
-    /* print(prefs.getString("nombreC")); */
+  }
+
+  Future<void> _getDeviceId() async {
+    try {
+      deviceId = await PlatformDeviceId.getDeviceId;
+    } catch (e) {
+      print("Error al obtener el identificador del dispositivo: $e");
+      deviceId = null;
+    }
+  }
+
+  void _loadAlbumData() async {
+    final requestData = {
+      'usuario': username,
+      'contraseña': password,
+      "token": tok, // Asegúrate de que el token se ha asignado correctamente
+      "alertas": alertC,
+      "mensajes": msjC,
+      "uuid": deviceId
+    };
+    final response = await http.post(
+      Uri.parse(
+        'https://net.agroentregas.com.ar/RestServiceImpl.svc/Firebase',
+      ),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "POST, GET, OPTIONS, PUT, DELETE, HEAD",
+      },
+      body: jsonEncode(requestData),
+    );
+    if (response.statusCode == 200) {
+      print("Data sent");
+      print(requestData);
+      print(response.statusCode);
+    } else {
+      print("send data error");
+    }
   }
 
   @override
@@ -223,6 +291,14 @@ class _LoginState extends State<Login> {
                           await prefs.setString('password', password);
                           await prefs.setBool('logInOut', true);
 
+                          // Actualiza los valores antes de enviar la solicitud
+                          setState(() {
+                            this.username = username;
+                            this.password = password;
+                          });
+
+                          // Carga los datos del álbum
+                          _loadAlbumData();
                           Navigator.pushNamed(
                             context,
                             "/home",

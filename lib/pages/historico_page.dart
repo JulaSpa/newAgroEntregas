@@ -203,12 +203,17 @@ class _HistoricState extends State<Historic> {
                             final prefs = await SharedPreferences.getInstance();
                             final String cpBuscarPage = nroCP.text;
                             await prefs.setString('cpBuscarPage', cpBuscarPage);
+
                             if (_selectedFromDate != null &&
                                 _selectedToDate != null) {
                               await prefs.setString('fromDate',
                                   _selectedFromDate!.toIso8601String());
                               await prefs.setString(
                                   'toDate', _selectedToDate!.toIso8601String());
+                            } else {
+                              // Si las fechas no están seleccionadas, borra las entradas de SharedPreferences
+                              await prefs.remove('fromDate');
+                              await prefs.remove('toDate');
                             }
 
                             // Usa el contexto almacenado dentro del contexto asíncrono

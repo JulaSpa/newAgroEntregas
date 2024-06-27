@@ -90,7 +90,7 @@ class _BuscarState extends State<Buscar> {
     if (response.statusCode == 200) {
       final exp = RegExp(r'<[^>]*>', multiLine: true, caseSensitive: true);
       final jsonContent = response.body.replaceAll(exp, '');
-
+      print(requestData);
       try {
         final List<dynamic> responseJson = jsonDecode(jsonContent);
         final List<Album> albums =
